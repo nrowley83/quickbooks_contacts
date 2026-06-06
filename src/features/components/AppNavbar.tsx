@@ -81,7 +81,9 @@ const navItems: NavItem[] = [
     icon: faCalculator,
     items: [
       { label: "Vouchers", href: "/backoffice/vouchers" },
-      { label: "My Receivables", href: "/backoffice/receivables" },
+      { label: "Receivables", href: "/backoffice/receivables" },
+      { label: "Deposits", href: "/backoffice/deposits" },
+      { label: "Payables", href: "/app/payables" },
     ],
   },
   { label: "Reports", icon: faSignal, href: "/app/reports" },

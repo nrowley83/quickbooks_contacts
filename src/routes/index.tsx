@@ -55,6 +55,30 @@ function Home() {
           </Link>
         </div>
         <div className="col-md-4">
+          <Link to="/app/payables" className="text-decoration-none">
+            <Card className="shadow-sm h-100">
+              <CardHeader>
+                <CardTitle>Payables</CardTitle>
+              </CardHeader>
+              <CardBody>
+                Payables list grouped by payee with Create Payment modal.
+              </CardBody>
+            </Card>
+          </Link>
+        </div>
+        <div className="col-md-4">
+          <Link to="/app/company" className="text-decoration-none">
+            <Card className="shadow-sm h-100">
+              <CardHeader>
+                <CardTitle>Company Settings</CardTitle>
+              </CardHeader>
+              <CardBody>
+                Company Settings page with Commission Plans and Deduction Categories tables.
+              </CardBody>
+            </Card>
+          </Link>
+        </div>
+        <div className="col-md-4">
           <Link to="/app/quickbooks-contact-sync" className="text-decoration-none">
             <Card className="shadow-sm h-100">
               <CardHeader>

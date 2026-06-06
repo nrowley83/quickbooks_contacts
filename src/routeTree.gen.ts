@@ -14,6 +14,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppReportsRouteImport } from './routes/app/reports'
 import { Route as AppQuickbooksContactSyncRouteImport } from './routes/app/quickbooks-contact-sync'
+import { Route as AppPayablesRouteImport } from './routes/app/payables'
+import { Route as AppCompanyRouteImport } from './routes/app/company'
 
 const AppRoute = AppRouteImport.update({
   id: '/app',
@@ -41,16 +43,30 @@ const AppQuickbooksContactSyncRoute =
     path: '/quickbooks-contact-sync',
     getParentRoute: () => AppRoute,
   } as any)
+const AppPayablesRoute = AppPayablesRouteImport.update({
+  id: '/payables',
+  path: '/payables',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCompanyRoute = AppCompanyRouteImport.update({
+  id: '/company',
+  path: '/company',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/app/company': typeof AppCompanyRoute
+  '/app/payables': typeof AppPayablesRoute
   '/app/quickbooks-contact-sync': typeof AppQuickbooksContactSyncRoute
   '/app/reports': typeof AppReportsRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/app/company': typeof AppCompanyRoute
+  '/app/payables': typeof AppPayablesRoute
   '/app/quickbooks-contact-sync': typeof AppQuickbooksContactSyncRoute
   '/app/reports': typeof AppReportsRoute
   '/app': typeof AppIndexRoute
@@ -59,6 +75,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/app/company': typeof AppCompanyRoute
+  '/app/payables': typeof AppPayablesRoute
   '/app/quickbooks-contact-sync': typeof AppQuickbooksContactSyncRoute
   '/app/reports': typeof AppReportsRoute
   '/app/': typeof AppIndexRoute
@@ -68,15 +86,25 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/app'
+    | '/app/company'
+    | '/app/payables'
     | '/app/quickbooks-contact-sync'
     | '/app/reports'
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/app/quickbooks-contact-sync' | '/app/reports' | '/app'
+  to:
+    | '/'
+    | '/app/company'
+    | '/app/payables'
+    | '/app/quickbooks-contact-sync'
+    | '/app/reports'
+    | '/app'
   id:
     | '__root__'
     | '/'
     | '/app'
+    | '/app/company'
+    | '/app/payables'
     | '/app/quickbooks-contact-sync'
     | '/app/reports'
     | '/app/'
@@ -124,16 +152,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppQuickbooksContactSyncRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/payables': {
+      id: '/app/payables'
+      path: '/payables'
+      fullPath: '/app/payables'
+      preLoaderRoute: typeof AppPayablesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/company': {
+      id: '/app/company'
+      path: '/company'
+      fullPath: '/app/company'
+      preLoaderRoute: typeof AppCompanyRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppCompanyRoute: typeof AppCompanyRoute
+  AppPayablesRoute: typeof AppPayablesRoute
   AppQuickbooksContactSyncRoute: typeof AppQuickbooksContactSyncRoute
   AppReportsRoute: typeof AppReportsRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppCompanyRoute: AppCompanyRoute,
+  AppPayablesRoute: AppPayablesRoute,
   AppQuickbooksContactSyncRoute: AppQuickbooksContactSyncRoute,
   AppReportsRoute: AppReportsRoute,
   AppIndexRoute: AppIndexRoute,

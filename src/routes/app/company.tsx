@@ -212,11 +212,8 @@ function AssignUsersModal({
   return (
     <Modal open={open} onOpenChange={handleOpen}>
       <ModalContent size="xl" centered>
-        <ModalHeader className="d-flex align-items-center justify-content-between border-0 pb-0">
+        <ModalHeader className="border-0 pb-0">
           <ModalTitle style={{ fontSize: 22, fontWeight: 700 }}>Assign Users</ModalTitle>
-          <ModalClose render={<button className="btn btn-link p-0 text-dark border-0" style={{ fontSize: 20, lineHeight: 1 }} />}>
-            <FontAwesomeIcon icon={faXmark} />
-          </ModalClose>
         </ModalHeader>
 
         <ModalBody>

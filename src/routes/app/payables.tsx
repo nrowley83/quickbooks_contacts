@@ -134,11 +134,8 @@ function CreatePaymentModal({
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
       <ModalContent size="lg" centered>
-        <ModalHeader className="d-flex align-items-center justify-content-between border-bottom pb-3">
+        <ModalHeader className="border-bottom pb-3">
           <ModalTitle style={{ fontSize: 18 }}>Create Payment</ModalTitle>
-          <ModalClose render={<button className="btn btn-link p-0 text-muted border-0" />}>
-            <FontAwesomeIcon icon={faXmark} style={{ fontSize: 18 }} />
-          </ModalClose>
         </ModalHeader>
 
         <ModalBody className="py-4">

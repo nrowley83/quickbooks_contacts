@@ -480,6 +480,27 @@ function CompanySection() {
 
         <hr className="my-4" />
 
+        {/* Data Mining Report */}
+        <section className="mb-4">
+          <h5 className="fw-bold mb-3">Data Mining Report</h5>
+          <div className="form-check">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="hide-transaction-value"
+              defaultChecked
+            />
+            <label className="form-check-label fw-medium ms-2" htmlFor="hide-transaction-value">
+              Hide Transaction Value for Non-Disclosure States
+            </label>
+            <div className="form-text">
+              Transaction values for deals in non-disclosure states will automatically be hidden in the Data Mining Report
+            </div>
+          </div>
+        </section>
+
+        <hr className="my-4" />
+
         {/* Social Media */}
         <section className="mb-4">
           <h5 className="fw-bold mb-3">Social Media</h5>
@@ -522,7 +543,7 @@ function CompanySection() {
           <h5 className="fw-bold mb-3">Listing Visibility</h5>
           <div className="form-check mb-3">
             <input type="checkbox" className="form-check-input" id="share-on-market" />
-            <label className="form-check-label fw-medium" htmlFor="share-on-market">
+            <label className="form-check-label fw-medium ms-2" htmlFor="share-on-market">
               Share &apos;On Market&apos; Listings
             </label>
             <div className="form-text">
@@ -531,7 +552,7 @@ function CompanySection() {
           </div>
           <div className="form-check">
             <input type="checkbox" className="form-check-input" id="share-closed" />
-            <label className="form-check-label fw-medium" htmlFor="share-closed">
+            <label className="form-check-label fw-medium ms-2" htmlFor="share-closed">
               Share &apos;Closed&apos; Listings
             </label>
             <div className="form-text">

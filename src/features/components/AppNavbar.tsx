@@ -37,6 +37,7 @@ import {
   faArrowRightFromBracket,
 } from "@fortawesome/pro-regular-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { Link } from "@tanstack/react-router";
 import BuildoutLogo from "#/features/assets/buildout-logo";
 
 type NavDropdownItem = { label: string; href: string };
@@ -61,7 +62,7 @@ const navItems: NavItem[] = [
     label: "Deals",
     icon: faHandshake,
     items: [
-      { label: "Pipeline", href: "/deals/pipeline" },
+      { label: "Pipeline", href: "/app/deals-pipeline" },
       { label: "Broker Earnings", href: "/backoffice/broker_earnings" },
       { label: "Transactions", href: "/deals/transactions" },
     ],
@@ -163,7 +164,10 @@ export default function AppNavbar() {
                 </NavbarGroupTrigger>
                 <NavbarGroupMenu>
                   {item.items.map((sub) => (
-                    <NavbarGroupMenuItem key={sub.href} render={<a href={sub.href} />}>
+                    <NavbarGroupMenuItem
+                      key={sub.href}
+                      render={sub.href.startsWith("/app") ? <Link to={sub.href} /> : <a href={sub.href} />}
+                    >
                       {sub.label}
                     </NavbarGroupMenuItem>
                   ))}

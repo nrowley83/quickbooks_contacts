@@ -15,6 +15,7 @@ import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppReportsRouteImport } from './routes/app/reports'
 import { Route as AppQuickbooksContactSyncRouteImport } from './routes/app/quickbooks-contact-sync'
 import { Route as AppPayablesRouteImport } from './routes/app/payables'
+import { Route as AppDealsPipelineRouteImport } from './routes/app/deals-pipeline'
 import { Route as AppDataMiningReportRouteImport } from './routes/app/data-mining-report'
 import { Route as AppCompanyRouteImport } from './routes/app/company'
 
@@ -49,6 +50,11 @@ const AppPayablesRoute = AppPayablesRouteImport.update({
   path: '/payables',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDealsPipelineRoute = AppDealsPipelineRouteImport.update({
+  id: '/deals-pipeline',
+  path: '/deals-pipeline',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDataMiningReportRoute = AppDataMiningReportRouteImport.update({
   id: '/data-mining-report',
   path: '/data-mining-report',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/app/company': typeof AppCompanyRoute
   '/app/data-mining-report': typeof AppDataMiningReportRoute
+  '/app/deals-pipeline': typeof AppDealsPipelineRoute
   '/app/payables': typeof AppPayablesRoute
   '/app/quickbooks-contact-sync': typeof AppQuickbooksContactSyncRoute
   '/app/reports': typeof AppReportsRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app/company': typeof AppCompanyRoute
   '/app/data-mining-report': typeof AppDataMiningReportRoute
+  '/app/deals-pipeline': typeof AppDealsPipelineRoute
   '/app/payables': typeof AppPayablesRoute
   '/app/quickbooks-contact-sync': typeof AppQuickbooksContactSyncRoute
   '/app/reports': typeof AppReportsRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/app/company': typeof AppCompanyRoute
   '/app/data-mining-report': typeof AppDataMiningReportRoute
+  '/app/deals-pipeline': typeof AppDealsPipelineRoute
   '/app/payables': typeof AppPayablesRoute
   '/app/quickbooks-contact-sync': typeof AppQuickbooksContactSyncRoute
   '/app/reports': typeof AppReportsRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/app/company'
     | '/app/data-mining-report'
+    | '/app/deals-pipeline'
     | '/app/payables'
     | '/app/quickbooks-contact-sync'
     | '/app/reports'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app/company'
     | '/app/data-mining-report'
+    | '/app/deals-pipeline'
     | '/app/payables'
     | '/app/quickbooks-contact-sync'
     | '/app/reports'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/app/company'
     | '/app/data-mining-report'
+    | '/app/deals-pipeline'
     | '/app/payables'
     | '/app/quickbooks-contact-sync'
     | '/app/reports'
@@ -171,6 +183,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPayablesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/deals-pipeline': {
+      id: '/app/deals-pipeline'
+      path: '/deals-pipeline'
+      fullPath: '/app/deals-pipeline'
+      preLoaderRoute: typeof AppDealsPipelineRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/data-mining-report': {
       id: '/app/data-mining-report'
       path: '/data-mining-report'
@@ -191,6 +210,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppCompanyRoute: typeof AppCompanyRoute
   AppDataMiningReportRoute: typeof AppDataMiningReportRoute
+  AppDealsPipelineRoute: typeof AppDealsPipelineRoute
   AppPayablesRoute: typeof AppPayablesRoute
   AppQuickbooksContactSyncRoute: typeof AppQuickbooksContactSyncRoute
   AppReportsRoute: typeof AppReportsRoute
@@ -200,6 +220,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppCompanyRoute: AppCompanyRoute,
   AppDataMiningReportRoute: AppDataMiningReportRoute,
+  AppDealsPipelineRoute: AppDealsPipelineRoute,
   AppPayablesRoute: AppPayablesRoute,
   AppQuickbooksContactSyncRoute: AppQuickbooksContactSyncRoute,
   AppReportsRoute: AppReportsRoute,

@@ -25,7 +25,6 @@ import {
   faMagnifyingGlass,
   faCircleInfo,
   faPaintbrushPencil,
-  faEllipsis,
 } from "@fortawesome/pro-regular-svg-icons";
 import {
   Modal,
@@ -374,9 +373,7 @@ function CompanySection() {
           <h5 className="fw-bold mb-3">Company Information</h5>
           <div className="row g-3">
             <div className="col-6">
-              <label className="form-label fw-medium">
-                Company Name<span className="text-danger">*</span>
-              </label>
+              <label className="form-label fw-medium">Company Name</label>
               <input type="text" className="form-control" defaultValue="NAI Demo" />
             </div>
             <div className="col-6">
@@ -386,12 +383,7 @@ function CompanySection() {
 
             <div className="col-6">
               <label className="form-label fw-medium">Salesforce ID</label>
-              <div className="input-group">
-                <input type="text" className="form-control" defaultValue="00013700003mZtc" />
-                <button className="btn btn-danger" type="button">
-                  <FontAwesomeIcon icon={faEllipsis} style={{ fontSize: 12 }} />
-                </button>
-              </div>
+              <input type="text" className="form-control" defaultValue="00013700003mZtc" />
             </div>
             <div className="col-6">
               <label className="form-label fw-medium">Admin Email Addresses</label>

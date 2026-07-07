@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -5,7 +6,12 @@ import {
   faCaretDown,
   faCircleExclamation,
   faEllipsisVertical,
+  faXmark,
+  faUser,
+  faCalendarPlus,
+  faSliders,
 } from "@fortawesome/pro-regular-svg-icons";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { Button } from "@buildoutinc/blueprint-react/ui/Button";
 import {
   DropdownMenu,
@@ -15,6 +21,15 @@ import {
 } from "@buildoutinc/blueprint-react/ui/DropdownMenu";
 import { Input } from "@buildoutinc/blueprint-react/ui/Input";
 import { InputGroup, InputGroupAddon } from "@buildoutinc/blueprint-react/ui/InputGroup";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalTitle,
+  ModalBody,
+  ModalFooter,
+  ModalClose,
+} from "@buildoutinc/blueprint-react/ui/Modal";
 import {
   Table,
   TableHeader,
@@ -60,9 +75,332 @@ const DEALS = [
   { title: "Import Sale", id: "114055", location: "Chicago, IL", dealType: "Sale", propertyType: "", value: "$0", gross: "$0", tasks: "0 tasks open" },
 ];
 
+// ─── Add Closed Deal modal ────────────────────────────────────────────────────
+
+const BROKER_OPTIONS = ["Bill Broker", "Jenny Broker", "Brian Reynolds", "May Broker"];
+const PCT_OPTIONS = ["10%", "20%", "25%", "50%", "75%", "100%"];
+
+type BrokerRow = { broker: string; pct: string };
+
+function RepeatableSection({
+  title,
+  addLabel,
+  items,
+  onAdd,
+  onRemove,
+  onChange,
+  emptyIcon,
+  emptyText,
+  placeholder,
+}: {
+  title: string;
+  addLabel: string;
+  items: string[];
+  onAdd: () => void;
+  onRemove: (i: number) => void;
+  onChange: (i: number, value: string) => void;
+  emptyIcon: IconDefinition;
+  emptyText: string;
+  placeholder: string;
+}) {
+  return (
+    <>
+      <div className="d-flex align-items-center justify-content-between mt-4 mb-3">
+        <h6 className="fw-normal fs-5 mb-0">{title}</h6>
+        <Button variant="ghost" size="sm" className="text-primary" onClick={onAdd}>
+          {addLabel}
+        </Button>
+      </div>
+      {items.length === 0 ? (
+        <div
+          className="border rounded p-3 d-flex align-items-center gap-3"
+          style={{ borderStyle: "dashed" }}
+        >
+          <FontAwesomeIcon icon={emptyIcon} className="text-primary" style={{ fontSize: 20 }} />
+          <span>{emptyText}</span>
+        </div>
+      ) : (
+        <div className="d-flex flex-column gap-2">
+          {items.map((val, i) => (
+            <div className="d-flex gap-2" key={i}>
+              <Input
+                placeholder={placeholder}
+                value={val}
+                onValueChange={(v) => onChange(i, v)}
+              />
+              <button className="btn btn-link text-muted p-0 px-2" onClick={() => onRemove(i)}>
+                <FontAwesomeIcon icon={faXmark} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+function useRepeatableSection() {
+  const [items, setItems] = useState<string[]>([]);
+  return {
+    items,
+    add: () => setItems((rows) => [...rows, ""]),
+    remove: (i: number) => setItems((rows) => rows.filter((_, idx) => idx !== i)),
+    change: (i: number, value: string) =>
+      setItems((rows) => rows.map((r, idx) => (idx === i ? value : r))),
+  };
+}
+
+function AddClosedDealModal({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
+  const [dealType, setDealType] = useState("");
+  const [dealTitle, setDealTitle] = useState("");
+  const [dealId, setDealId] = useState("");
+  const [brokers, setBrokers] = useState<BrokerRow[]>([{ broker: "Bill Broker", pct: "100%" }]);
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [propertyState, setPropertyState] = useState("");
+  const [zip, setZip] = useState("");
+  const [propertyType, setPropertyType] = useState("");
+  const [transactionValue, setTransactionValue] = useState("");
+  const [closeDate, setCloseDate] = useState("");
+  const [brokerageGross, setBrokerageGross] = useState("");
+
+  const buyers = useRepeatableSection();
+  const sellers = useRepeatableSection();
+  const criticalDates = useRepeatableSection();
+  const customFields = useRepeatableSection();
+
+  const isSale = dealType === "Sale";
+
+  const updateBroker = (i: number, field: "broker" | "pct", value: string) =>
+    setBrokers((rows) => rows.map((r, idx) => (idx === i ? { ...r, [field]: value } : r)));
+
+  const brokerValue = (pct: string) => {
+    const gross = parseFloat(brokerageGross);
+    const pctNum = parseFloat(pct);
+    if (!gross || !pctNum) return "--";
+    return `$${Math.round((gross * pctNum) / 100).toLocaleString()}`;
+  };
+
+  return (
+    <Modal open={open} onOpenChange={onOpenChange}>
+      <ModalContent size="lg" centered scrollable>
+        <ModalHeader className="border-bottom pb-3">
+          <ModalTitle style={{ fontSize: 20 }}>Add Closed Deal</ModalTitle>
+        </ModalHeader>
+
+        <ModalBody className="py-4">
+          <div className="mb-3">
+            <label className="form-label">
+              Deal Type<span className="text-danger ms-1">*</span>
+            </label>
+            <select
+              className="form-select"
+              value={dealType}
+              onChange={(e) => setDealType(e.target.value)}
+            >
+              <option value="" disabled>Select...</option>
+              <option value="Sale">Sale</option>
+              <option value="Lease">Lease</option>
+            </select>
+          </div>
+
+          {isSale && (
+            <>
+              <h6 className="fw-normal fs-5 mt-4 mb-3">Deal Details</h6>
+              <div className="row g-3">
+                <div className="col-6">
+                  <label className="form-label">
+                    Deal Title<span className="text-danger ms-1">*</span>
+                  </label>
+                  <Input value={dealTitle} onValueChange={setDealTitle} />
+                </div>
+                <div className="col-6">
+                  <label className="form-label">Deal ID</label>
+                  <Input value={dealId} onValueChange={setDealId} placeholder="Auto-generated" />
+                </div>
+              </div>
+
+              <div className="d-flex align-items-center justify-content-between mt-4 mb-3">
+                <h6 className="fw-normal fs-5 mb-0">Brokers</h6>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary"
+                  onClick={() => setBrokers((rows) => [...rows, { broker: BROKER_OPTIONS[0], pct: "10%" }])}
+                >
+                  + Add Broker
+                </Button>
+              </div>
+              <div className="d-flex flex-column gap-2">
+                {brokers.map((b, i) => (
+                  <div className="d-flex gap-2" key={i}>
+                    <select
+                      className="form-select flex-grow-1"
+                      value={b.broker}
+                      onChange={(e) => updateBroker(i, "broker", e.target.value)}
+                    >
+                      {BROKER_OPTIONS.map((name) => (
+                        <option key={name} value={name}>{name}</option>
+                      ))}
+                    </select>
+                    <select
+                      className="form-select"
+                      style={{ width: 80 }}
+                      value={b.pct}
+                      onChange={(e) => updateBroker(i, "pct", e.target.value)}
+                    >
+                      {PCT_OPTIONS.map((pct) => (
+                        <option key={pct} value={pct}>{pct}</option>
+                      ))}
+                    </select>
+                    <div className="form-control text-end text-muted" style={{ width: 90 }}>
+                      {brokerValue(b.pct)}
+                    </div>
+                    {brokers.length > 1 && (
+                      <button
+                        className="btn btn-link text-muted p-0 px-2"
+                        onClick={() => setBrokers((rows) => rows.filter((_, idx) => idx !== i))}
+                      >
+                        <FontAwesomeIcon icon={faXmark} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <RepeatableSection
+                title="Buyer"
+                addLabel="+ Add Buyer"
+                items={buyers.items}
+                onAdd={buyers.add}
+                onRemove={buyers.remove}
+                onChange={buyers.change}
+                emptyIcon={faUser}
+                emptyText="No buyers added yet"
+                placeholder="Buyer name"
+              />
+
+              <RepeatableSection
+                title="Seller"
+                addLabel="+ Add Seller"
+                items={sellers.items}
+                onAdd={sellers.add}
+                onRemove={sellers.remove}
+                onChange={sellers.change}
+                emptyIcon={faUser}
+                emptyText="No sellers added yet"
+                placeholder="Seller name"
+              />
+
+              <RepeatableSection
+                title="Critical Dates"
+                addLabel="+ Add Critical Date"
+                items={criticalDates.items}
+                onAdd={criticalDates.add}
+                onRemove={criticalDates.remove}
+                onChange={criticalDates.change}
+                emptyIcon={faCalendarPlus}
+                emptyText="No critical dates added yet"
+                placeholder="e.g. Inspection Contingency — 03/15/2026"
+              />
+
+              <h6 className="fw-normal fs-5 mt-4 mb-3">Property</h6>
+              <div className="row g-3">
+                <div className="col-12">
+                  <label className="form-label">Address</label>
+                  <Input value={address} onValueChange={setAddress} />
+                </div>
+                <div className="col-4">
+                  <label className="form-label">City</label>
+                  <Input value={city} onValueChange={setCity} />
+                </div>
+                <div className="col-4">
+                  <label className="form-label">State</label>
+                  <Input value={propertyState} onValueChange={setPropertyState} />
+                </div>
+                <div className="col-4">
+                  <label className="form-label">Zip</label>
+                  <Input value={zip} onValueChange={setZip} />
+                </div>
+                <div className="col-6">
+                  <label className="form-label">Property Type</label>
+                  <select
+                    className="form-select"
+                    value={propertyType}
+                    onChange={(e) => setPropertyType(e.target.value)}
+                  >
+                    <option value="" disabled>Select...</option>
+                    <option value="Office">Office</option>
+                    <option value="Retail">Retail</option>
+                    <option value="Industrial">Industrial</option>
+                    <option value="Land">Land</option>
+                  </select>
+                </div>
+              </div>
+
+              <h6 className="fw-normal fs-5 mt-4 mb-3">Transaction</h6>
+              <div className="row g-3">
+                <div className="col-4">
+                  <label className="form-label">Transaction Value</label>
+                  <Input
+                    type="number"
+                    value={transactionValue}
+                    onValueChange={setTransactionValue}
+                  />
+                </div>
+                <div className="col-4">
+                  <label className="form-label">Close Date</label>
+                  <Input placeholder="MM/DD/YYYY" value={closeDate} onValueChange={setCloseDate} />
+                </div>
+                <div className="col-4">
+                  <label className="form-label">Brokerage Gross</label>
+                  <Input
+                    type="number"
+                    value={brokerageGross}
+                    onValueChange={setBrokerageGross}
+                  />
+                </div>
+              </div>
+
+              <RepeatableSection
+                title="Custom Fields"
+                addLabel="+ Add Custom Field"
+                items={customFields.items}
+                onAdd={customFields.add}
+                onRemove={customFields.remove}
+                onChange={customFields.change}
+                emptyIcon={faSliders}
+                emptyText="No custom fields added yet"
+                placeholder="Field value"
+              />
+            </>
+          )}
+        </ModalBody>
+
+        <ModalFooter className="d-flex justify-content-end gap-2 border-top pt-3">
+          <ModalClose render={<button className="btn btn-link text-decoration-none" />}>
+            Cancel
+          </ModalClose>
+          <Button variant="primary" onClick={() => onOpenChange(false)}>
+            Create Deal
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 function DealsPipelinePage() {
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
     <div className="container-fluid py-4 px-5" style={{ fontSize: 14 }}>
       <div className="d-flex align-items-center flex-wrap gap-2 mb-4">
@@ -94,8 +432,10 @@ function DealsPipelinePage() {
         <div className="flex-grow-1" />
 
         <Button variant="secondary">Import</Button>
-        <Button variant="primary">Add Closed Deal</Button>
+        <Button variant="primary" onClick={() => setModalOpen(true)}>Add Closed Deal</Button>
       </div>
+
+      <AddClosedDealModal open={modalOpen} onOpenChange={setModalOpen} />
 
       <Table>
         <TableHeader>

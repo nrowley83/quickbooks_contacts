@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -5,6 +6,7 @@ import {
   faChevronLeft,
   faArrowUpWideShort,
   faCaretDown,
+  faCheck,
 } from "@fortawesome/pro-regular-svg-icons";
 import {
   Breadcrumb,
@@ -85,9 +87,13 @@ const SUMMARY_ROW = HEADERS.map((h) => {
   return "";
 });
 
+const TRANSACTION_VALUE_INDEX = HEADERS.indexOf("Transaction Value");
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 function DataMiningReportPage() {
+  const [nonDisclosed, setNonDisclosed] = useState(false);
+
   return (
     <div className="container-fluid py-4 px-5" style={{ fontSize: 14 }}>
       <Breadcrumb className="mb-3">
@@ -101,38 +107,49 @@ function DataMiningReportPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="d-flex align-items-center justify-content-between mb-4">
+      <div className="d-flex align-items-start justify-content-between mb-4">
         <h4 className="fw-bold mb-0">Data Mining Report</h4>
-        <div className="d-flex gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button variant="primary">
-                  Actions
-                  <FontAwesomeIcon icon={faCaretDown} />
-                </Button>
-              }
-            />
-            <DropdownMenuContent>
-              <DropdownMenuItem>Export to Excel</DropdownMenuItem>
-              <DropdownMenuItem>Export to PDF</DropdownMenuItem>
-              <DropdownMenuItem>Print</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button variant="secondary">
-                  Save
-                  <FontAwesomeIcon icon={faCaretDown} />
-                </Button>
-              }
-            />
-            <DropdownMenuContent>
-              <DropdownMenuItem>Save</DropdownMenuItem>
-              <DropdownMenuItem>Save As New</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="d-flex flex-column align-items-end gap-2">
+          <Button
+            variant={nonDisclosed ? "primary" : "outline"}
+            size="sm"
+            aria-pressed={nonDisclosed}
+            onClick={() => setNonDisclosed((v) => !v)}
+          >
+            {nonDisclosed && <FontAwesomeIcon icon={faCheck} />}
+            Non-Disclosure
+          </Button>
+          <div className="d-flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button variant="primary">
+                    Actions
+                    <FontAwesomeIcon icon={faCaretDown} />
+                  </Button>
+                }
+              />
+              <DropdownMenuContent>
+                <DropdownMenuItem>Export to Excel</DropdownMenuItem>
+                <DropdownMenuItem>Export to PDF</DropdownMenuItem>
+                <DropdownMenuItem>Print</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button variant="secondary">
+                    Save
+                    <FontAwesomeIcon icon={faCaretDown} />
+                  </Button>
+                }
+              />
+              <DropdownMenuContent>
+                <DropdownMenuItem>Save</DropdownMenuItem>
+                <DropdownMenuItem>Save As New</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
 
@@ -211,16 +228,21 @@ function DataMiningReportPage() {
         <TableBody>
           <TableRow className="bg-purple-heart-50 fw-bold">
             {SUMMARY_ROW.map((v, i) => (
-              <TableCell key={i} className="text-nowrap">{v}</TableCell>
+              <TableCell key={i} className="text-nowrap">
+                {i === TRANSACTION_VALUE_INDEX && nonDisclosed ? "$10,300,000.00" : v}
+              </TableCell>
             ))}
           </TableRow>
           {ROWS.map((row, ri) => (
             <TableRow key={ri}>
-              {row.map((cell, ci) => (
-                <TableCell key={ci} className="text-nowrap">
-                  {cell === "" ? "--" : cell}
-                </TableCell>
-              ))}
+              {row.map((cell, ci) => {
+                const showNotDisclosed = ri === 0 && ci === TRANSACTION_VALUE_INDEX && nonDisclosed;
+                return (
+                  <TableCell key={ci} className="text-nowrap">
+                    {showNotDisclosed ? "Not Disclosed" : cell === "" ? "--" : cell}
+                  </TableCell>
+                );
+              })}
             </TableRow>
           ))}
         </TableBody>

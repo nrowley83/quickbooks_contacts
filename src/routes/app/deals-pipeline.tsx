@@ -22,6 +22,13 @@ import {
 import { Input } from "@buildoutinc/blueprint-react/ui/Input";
 import { InputGroup, InputGroupAddon } from "@buildoutinc/blueprint-react/ui/InputGroup";
 import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@buildoutinc/blueprint-react/ui/Select";
+import {
   Modal,
   ModalContent,
   ModalHeader,
@@ -112,17 +119,18 @@ const inputStyle: React.CSSProperties = {
   height: 37,
 };
 
-const selectChevron =
-  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 10l5 5 5-5z' fill='%23212630'/></svg>\")";
-
-const selectStyle: React.CSSProperties = {
-  ...inputStyle,
-  paddingRight: 36,
-  backgroundImage: selectChevron,
-  backgroundRepeat: "no-repeat",
-  backgroundPosition: "right 10px center",
-  backgroundSize: "16px",
-  appearance: "none",
+const selectTriggerStyle: React.CSSProperties = {
+  width: "100%",
+  height: 37,
+  padding: "8px 12px",
+  border: `1px solid ${MC.border}`,
+  borderRadius: 6,
+  fontSize: 14,
+  color: MC.bodyText,
+  background: "rgb(255, 255, 255)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
 };
 
 const sectionTitleRowStyle: React.CSSProperties = {
@@ -173,6 +181,18 @@ const emptyStateBoxStyle: React.CSSProperties = {
 
 const BROKER_OPTIONS = ["Bill Broker", "Jenny Broker", "Brian Reynolds", "May Broker"];
 const PCT_OPTIONS = ["10%", "20%", "25%", "50%", "75%", "100%"];
+const BROKER_ITEMS = BROKER_OPTIONS.map((name) => ({ label: name, value: name }));
+const PCT_ITEMS = PCT_OPTIONS.map((pct) => ({ label: pct, value: pct }));
+const DEAL_TYPE_ITEMS = [
+  { label: "Sale", value: "Sale" },
+  { label: "Lease", value: "Lease" },
+];
+const PROPERTY_TYPE_ITEMS = [
+  { label: "Office", value: "Office" },
+  { label: "Retail", value: "Retail" },
+  { label: "Industrial", value: "Industrial" },
+  { label: "Land", value: "Land" },
+];
 
 type BrokerRow = { broker: string; pct: string };
 
@@ -201,9 +221,9 @@ function RepeatableSection({
     <>
       <div style={sectionTitleRowStyle}>
         <span>{title}</span>
-        <button type="button" style={addLinkStyle} onClick={onAdd}>
+        <Button type="button" variant="ghost" style={addLinkStyle} onClick={onAdd}>
           {addLabel}
-        </button>
+        </Button>
       </div>
       {items.length === 0 ? (
         <div style={emptyStateBoxStyle}>
@@ -220,9 +240,9 @@ function RepeatableSection({
                 value={val}
                 onValueChange={(v) => onChange(i, v)}
               />
-              <button type="button" style={removeButtonStyle} onClick={() => onRemove(i)}>
+              <Button type="button" variant="ghost" style={removeButtonStyle} onClick={() => onRemove(i)}>
                 <FontAwesomeIcon icon={faXmark} />
-              </button>
+              </Button>
             </div>
           ))}
         </div>
@@ -297,15 +317,20 @@ function AddClosedDealModal({
             <label style={fieldLabelStyle}>
               Deal Type<span style={requiredStyle}>*</span>
             </label>
-            <select
-              style={selectStyle}
-              value={dealType}
-              onChange={(e) => setDealType(e.target.value)}
+            <Select
+              items={DEAL_TYPE_ITEMS}
+              value={dealType || null}
+              onValueChange={(v) => setDealType(v ?? "")}
             >
-              <option value="" disabled>Select...</option>
-              <option value="Sale">Sale</option>
-              <option value="Lease">Lease</option>
-            </select>
+              <SelectTrigger style={selectTriggerStyle}>
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                {DEAL_TYPE_ITEMS.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {isSale && (
@@ -331,46 +356,58 @@ function AddClosedDealModal({
 
               <div style={sectionTitleRowStyle}>
                 <span>Brokers</span>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
                   style={addLinkStyle}
                   onClick={() => setBrokers((rows) => [...rows, { broker: BROKER_OPTIONS[0], pct: "10%" }])}
                 >
                   + Add Broker
-                </button>
+                </Button>
               </div>
               <div>
                 {brokers.map((b, i) => (
                   <div style={brokerRowStyle} key={i}>
-                    <select
-                      style={{ ...selectStyle, flex: 1 }}
+                    <Select
+                      items={BROKER_ITEMS}
                       value={b.broker}
-                      onChange={(e) => updateBroker(i, "broker", e.target.value)}
+                      onValueChange={(v) => updateBroker(i, "broker", v ?? "")}
                     >
-                      {BROKER_OPTIONS.map((name) => (
-                        <option key={name} value={name}>{name}</option>
-                      ))}
-                    </select>
-                    <select
-                      style={{ ...selectStyle, width: 64, flex: "0 0 auto" }}
+                      <SelectTrigger style={{ ...selectTriggerStyle, flex: 1 }}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {BROKER_ITEMS.map((item) => (
+                          <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      items={PCT_ITEMS}
                       value={b.pct}
-                      onChange={(e) => updateBroker(i, "pct", e.target.value)}
+                      onValueChange={(v) => updateBroker(i, "pct", v ?? "")}
                     >
-                      {PCT_OPTIONS.map((pct) => (
-                        <option key={pct} value={pct}>{pct}</option>
-                      ))}
-                    </select>
+                      <SelectTrigger style={{ ...selectTriggerStyle, width: 64, flex: "0 0 auto", padding: "8px 6px" }}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PCT_ITEMS.map((item) => (
+                          <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <div style={{ width: 80, flex: "0 0 auto", textAlign: "right", paddingTop: 8 }}>
                       {brokerValue(b.pct)}
                     </div>
                     {brokers.length > 1 && (
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
                         style={removeButtonStyle}
                         onClick={() => setBrokers((rows) => rows.filter((_, idx) => idx !== i))}
                       >
                         <FontAwesomeIcon icon={faXmark} />
-                      </button>
+                      </Button>
                     )}
                   </div>
                 ))}
@@ -433,17 +470,20 @@ function AddClosedDealModal({
               </div>
               <div style={fieldWrapperStyle}>
                 <label style={fieldLabelStyle}>Property Type</label>
-                <select
-                  style={selectStyle}
-                  value={propertyType}
-                  onChange={(e) => setPropertyType(e.target.value)}
+                <Select
+                  items={PROPERTY_TYPE_ITEMS}
+                  value={propertyType || null}
+                  onValueChange={(v) => setPropertyType(v ?? "")}
                 >
-                  <option value="" disabled>Select...</option>
-                  <option value="Office">Office</option>
-                  <option value="Retail">Retail</option>
-                  <option value="Industrial">Industrial</option>
-                  <option value="Land">Land</option>
-                </select>
+                  <SelectTrigger style={selectTriggerStyle}>
+                    <SelectValue placeholder="Select..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PROPERTY_TYPE_ITEMS.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div style={{ ...sectionTitleRowStyle, justifyContent: "flex-start" }}>Transaction</div>

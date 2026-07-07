@@ -717,7 +717,31 @@ function AddClosedDealModal({
                 <label style={fieldLabelStyle}>
                   Sale Price<span style={requiredStyle}>*</span>
                 </label>
-                <Input style={inputStyle} type="number" value={salePrice} onValueChange={setSalePrice} />
+                <InputGroup style={{ display: "flex" }}>
+                  <InputGroupAddon
+                    asText
+                    style={{
+                      border: `1px solid ${MC.border}`,
+                      borderRight: "none",
+                      borderRadius: "6px 0 0 6px",
+                      padding: "8px 10px",
+                      fontSize: 14,
+                      color: MC.bodyText,
+                      background: "rgb(255, 255, 255)",
+                      display: "flex",
+                      alignItems: "center",
+                      height: 37,
+                    }}
+                  >
+                    $
+                  </InputGroupAddon>
+                  <Input
+                    style={{ ...inputStyle, borderRadius: "0 6px 6px 0" }}
+                    type="number"
+                    value={salePrice}
+                    onValueChange={setSalePrice}
+                  />
+                </InputGroup>
                 {isNonDisclosureState(propertyState) && (
                   <div style={{ color: MC.mutedIcon, fontSize: 12, marginTop: 4 }}>
                     Sale Price will not appear in the Data Mining Report

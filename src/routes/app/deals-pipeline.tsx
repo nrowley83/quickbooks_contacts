@@ -6,10 +6,9 @@ import {
   faCaretDown,
   faCircleExclamation,
   faEllipsisVertical,
+  faEllipsis,
   faXmark,
   faUser,
-  faCalendarPlus,
-  faSliders,
 } from "@fortawesome/pro-regular-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { Button } from "@buildoutinc/blueprint-react/ui/Button";
@@ -193,34 +192,92 @@ const PROPERTY_TYPE_ITEMS = [
   { label: "Industrial", value: "Industrial" },
   { label: "Land", value: "Land" },
 ];
+const PROPERTY_SUBTYPE_ITEMS = [
+  { label: "Office Building", value: "Office Building" },
+  { label: "Retail Strip Center", value: "Retail Strip Center" },
+  { label: "Warehouse/Distribution", value: "Warehouse/Distribution" },
+  { label: "Land Parcel", value: "Land Parcel" },
+];
+const TRANSACTION_TYPE_ITEMS = [
+  { label: "Investment Sale", value: "Investment Sale" },
+  { label: "Owner-User Sale", value: "Owner-User Sale" },
+  { label: "1031 Exchange", value: "1031 Exchange" },
+  { label: "Sale-Leaseback", value: "Sale-Leaseback" },
+];
+const CONFIDENTIAL_ITEMS = [
+  { label: "Yes", value: "Yes" },
+  { label: "No", value: "No" },
+];
 
-const NON_DISCLOSURE_STATES = [
+const US_STATES = [
+  { name: "Alabama", abbr: "AL" },
   { name: "Alaska", abbr: "AK" },
+  { name: "Arizona", abbr: "AZ" },
+  { name: "Arkansas", abbr: "AR" },
+  { name: "California", abbr: "CA" },
+  { name: "Colorado", abbr: "CO" },
+  { name: "Connecticut", abbr: "CT" },
+  { name: "Delaware", abbr: "DE" },
+  { name: "District of Columbia", abbr: "DC" },
+  { name: "Florida", abbr: "FL" },
+  { name: "Georgia", abbr: "GA" },
+  { name: "Hawaii", abbr: "HI" },
   { name: "Idaho", abbr: "ID" },
+  { name: "Illinois", abbr: "IL" },
+  { name: "Indiana", abbr: "IN" },
+  { name: "Iowa", abbr: "IA" },
   { name: "Kansas", abbr: "KS" },
+  { name: "Kentucky", abbr: "KY" },
   { name: "Louisiana", abbr: "LA" },
+  { name: "Maine", abbr: "ME" },
+  { name: "Maryland", abbr: "MD" },
+  { name: "Massachusetts", abbr: "MA" },
+  { name: "Michigan", abbr: "MI" },
+  { name: "Minnesota", abbr: "MN" },
   { name: "Mississippi", abbr: "MS" },
   { name: "Missouri", abbr: "MO" },
   { name: "Montana", abbr: "MT" },
+  { name: "Nebraska", abbr: "NE" },
+  { name: "Nevada", abbr: "NV" },
+  { name: "New Hampshire", abbr: "NH" },
+  { name: "New Jersey", abbr: "NJ" },
   { name: "New Mexico", abbr: "NM" },
+  { name: "New York", abbr: "NY" },
+  { name: "North Carolina", abbr: "NC" },
   { name: "North Dakota", abbr: "ND" },
+  { name: "Ohio", abbr: "OH" },
+  { name: "Oklahoma", abbr: "OK" },
+  { name: "Oregon", abbr: "OR" },
+  { name: "Pennsylvania", abbr: "PA" },
+  { name: "Rhode Island", abbr: "RI" },
+  { name: "South Carolina", abbr: "SC" },
+  { name: "South Dakota", abbr: "SD" },
+  { name: "Tennessee", abbr: "TN" },
   { name: "Texas", abbr: "TX" },
   { name: "Utah", abbr: "UT" },
+  { name: "Vermont", abbr: "VT" },
+  { name: "Virginia", abbr: "VA" },
+  { name: "Washington", abbr: "WA" },
+  { name: "West Virginia", abbr: "WV" },
+  { name: "Wisconsin", abbr: "WI" },
   { name: "Wyoming", abbr: "WY" },
 ];
+const STATE_ITEMS = US_STATES.map((s) => ({ label: s.name, value: s.abbr }));
 
-function isNonDisclosureState(value: string): boolean {
-  const normalized = value.trim().toLowerCase();
-  if (!normalized) return false;
-  return NON_DISCLOSURE_STATES.some(
-    (s) => s.name.toLowerCase() === normalized || s.abbr.toLowerCase() === normalized
-  );
+const NON_DISCLOSURE_STATE_ABBRS = [
+  "AK", "ID", "KS", "LA", "MS", "MO", "MT", "NM", "ND", "TX", "UT", "WY",
+];
+
+function isNonDisclosureState(abbr: string): boolean {
+  return NON_DISCLOSURE_STATE_ABBRS.includes(abbr);
 }
 
-type BrokerRow = { broker: string; pct: string };
+type BrokerRow = { broker: string; pct: string; value: string };
+type OutsideBrokerRow = { contact: string; pct: string; value: string };
 
 function RepeatableSection({
   title,
+  required,
   addLabel,
   items,
   onAdd,
@@ -231,6 +288,7 @@ function RepeatableSection({
   placeholder,
 }: {
   title: string;
+  required?: boolean;
   addLabel: string;
   items: string[];
   onAdd: () => void;
@@ -243,7 +301,10 @@ function RepeatableSection({
   return (
     <>
       <div style={sectionTitleRowStyle}>
-        <span>{title}</span>
+        <span>
+          {title}
+          {required && <span style={requiredStyle}>*</span>}
+        </span>
         <Button type="button" variant="ghost" style={addLinkStyle} onClick={onAdd}>
           {addLabel}
         </Button>
@@ -295,32 +356,43 @@ function AddClosedDealModal({
   const [dealType, setDealType] = useState("");
   const [dealTitle, setDealTitle] = useState("");
   const [dealId, setDealId] = useState("");
-  const [brokers, setBrokers] = useState<BrokerRow[]>([{ broker: "Bill Broker", pct: "100%" }]);
+  const [primaryBrokers, setPrimaryBrokers] = useState<BrokerRow[]>([
+    { broker: "", pct: "", value: "0" },
+  ]);
+  const [outsideBrokers, setOutsideBrokers] = useState<OutsideBrokerRow[]>([
+    { contact: "", pct: "", value: "0" },
+  ]);
+  const [closeDate, setCloseDate] = useState("");
+  const [propertyType, setPropertyType] = useState("");
+  const [propertySubtype, setPropertySubtype] = useState("");
+  const [propertyName, setPropertyName] = useState("");
   const [address, setAddress] = useState("");
+  const [address2, setAddress2] = useState("");
   const [city, setCity] = useState("");
   const [propertyState, setPropertyState] = useState("");
   const [zip, setZip] = useState("");
-  const [propertyType, setPropertyType] = useState("");
-  const [transactionValue, setTransactionValue] = useState("");
-  const [closeDate, setCloseDate] = useState("");
-  const [brokerageGross, setBrokerageGross] = useState("");
+  const [county, setCounty] = useState("");
+  const [buildingSize, setBuildingSize] = useState("");
+  const [salePrice, setSalePrice] = useState("");
+  const [grossCommissionPct, setGrossCommissionPct] = useState("");
+  const [grossCommissionDollar, setGrossCommissionDollar] = useState("");
+  const [transactionType, setTransactionType] = useState("");
+  const [buyerTenantCompanyType, setBuyerTenantCompanyType] = useState("");
+  const [sellerLandlordCompanyType, setSellerLandlordCompanyType] = useState("");
+  const [referralSource, setReferralSource] = useState("");
+  const [operatingExpenses, setOperatingExpenses] = useState("");
+  const [confidential, setConfidential] = useState("");
 
   const buyers = useRepeatableSection();
   const sellers = useRepeatableSection();
-  const criticalDates = useRepeatableSection();
-  const customFields = useRepeatableSection();
 
   const isSale = dealType === "Sale";
 
-  const updateBroker = (i: number, field: "broker" | "pct", value: string) =>
-    setBrokers((rows) => rows.map((r, idx) => (idx === i ? { ...r, [field]: value } : r)));
+  const updatePrimaryBroker = (i: number, field: keyof BrokerRow, value: string) =>
+    setPrimaryBrokers((rows) => rows.map((r, idx) => (idx === i ? { ...r, [field]: value } : r)));
 
-  const brokerValue = (pct: string) => {
-    const gross = parseFloat(brokerageGross);
-    const pctNum = parseFloat(pct);
-    if (!gross || !pctNum) return "--";
-    return `$${Math.round((gross * pctNum) / 100).toLocaleString()}`;
-  };
+  const updateOutsideBroker = (i: number, field: keyof OutsideBrokerRow, value: string) =>
+    setOutsideBrokers((rows) => rows.map((r, idx) => (idx === i ? { ...r, [field]: value } : r)));
 
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
@@ -336,6 +408,7 @@ function AddClosedDealModal({
         </ModalHeader>
 
         <ModalBody style={{ paddingTop: 0, paddingBottom: 0, paddingLeft: 32, paddingRight: 32 }}>
+          <div style={{ ...sectionTitleRowStyle, justifyContent: "flex-start", margin: "0 0 16px" }}>Deal</div>
           <div style={fieldWrapperStyle}>
             <label style={fieldLabelStyle}>
               Deal Type<span style={requiredStyle}>*</span>
@@ -358,46 +431,39 @@ function AddClosedDealModal({
 
           {isSale && (
             <>
-              <div style={{ ...sectionTitleRowStyle, justifyContent: "flex-start" }}>Deal Details</div>
-              <div style={{ display: "flex", gap: 16, ...fieldWrapperStyle }}>
-                <div style={{ flex: 1 }}>
-                  <label style={fieldLabelStyle}>
-                    Deal Title<span style={requiredStyle}>*</span>
-                  </label>
-                  <Input style={inputStyle} value={dealTitle} onValueChange={setDealTitle} />
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>Deal Title</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <Input style={{ ...inputStyle, flex: 1 }} value={dealTitle} onValueChange={setDealTitle} />
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    style={{ height: 37, padding: "0 12px", flex: "0 0 auto" }}
+                  >
+                    <FontAwesomeIcon icon={faEllipsis} />
+                  </button>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <label style={fieldLabelStyle}>Deal ID</label>
-                  <Input
-                    style={inputStyle}
-                    value={dealId}
-                    onValueChange={setDealId}
-                    placeholder="Auto-generated"
-                  />
-                </div>
+              </div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>Deal ID</label>
+                <Input style={inputStyle} value={dealId} onValueChange={setDealId} />
               </div>
 
-              <div style={sectionTitleRowStyle}>
-                <span>Brokers</span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  style={addLinkStyle}
-                  onClick={() => setBrokers((rows) => [...rows, { broker: BROKER_OPTIONS[0], pct: "10%" }])}
-                >
-                  + Add Broker
-                </Button>
-              </div>
+              <div style={{ ...sectionTitleRowStyle, justifyContent: "flex-start" }}>Brokers</div>
+
+              <label style={fieldLabelStyle}>
+                Primary Broker<span style={requiredStyle}>*</span>
+              </label>
               <div>
-                {brokers.map((b, i) => (
+                {primaryBrokers.map((b, i) => (
                   <div style={brokerRowStyle} key={i}>
                     <Select
                       items={BROKER_ITEMS}
-                      value={b.broker}
-                      onValueChange={(v) => updateBroker(i, "broker", v ?? "")}
+                      value={b.broker || null}
+                      onValueChange={(v) => updatePrimaryBroker(i, "broker", v ?? "")}
                     >
                       <SelectTrigger style={{ ...selectTriggerStyle, flex: 1 }}>
-                        <SelectValue />
+                        <SelectValue placeholder="Select..." />
                       </SelectTrigger>
                       <SelectContent>
                         {BROKER_ITEMS.map((item) => (
@@ -407,11 +473,11 @@ function AddClosedDealModal({
                     </Select>
                     <Select
                       items={PCT_ITEMS}
-                      value={b.pct}
-                      onValueChange={(v) => updateBroker(i, "pct", v ?? "")}
+                      value={b.pct || null}
+                      onValueChange={(v) => updatePrimaryBroker(i, "pct", v ?? "")}
                     >
                       <SelectTrigger style={{ ...selectTriggerStyle, width: 64, flex: "0 0 auto", padding: "8px 6px" }}>
-                        <SelectValue />
+                        <SelectValue placeholder="%" />
                       </SelectTrigger>
                       <SelectContent>
                         {PCT_ITEMS.map((item) => (
@@ -419,15 +485,18 @@ function AddClosedDealModal({
                         ))}
                       </SelectContent>
                     </Select>
-                    <div style={{ width: 80, flex: "0 0 auto", textAlign: "right", paddingTop: 8 }}>
-                      {brokerValue(b.pct)}
-                    </div>
-                    {brokers.length > 1 && (
+                    <Input
+                      style={{ ...inputStyle, width: 90, flex: "0 0 auto" }}
+                      type="number"
+                      value={b.value}
+                      onValueChange={(v) => updatePrimaryBroker(i, "value", v)}
+                    />
+                    {primaryBrokers.length > 1 && (
                       <Button
                         type="button"
                         variant="ghost"
                         style={removeButtonStyle}
-                        onClick={() => setBrokers((rows) => rows.filter((_, idx) => idx !== i))}
+                        onClick={() => setPrimaryBrokers((rows) => rows.filter((_, idx) => idx !== i))}
                       >
                         <FontAwesomeIcon icon={faXmark} />
                       </Button>
@@ -435,64 +504,122 @@ function AddClosedDealModal({
                   </div>
                 ))}
               </div>
+              <div style={{ marginBottom: 16 }}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  style={addLinkStyle}
+                  onClick={() => setPrimaryBrokers((rows) => [...rows, { broker: "", pct: "", value: "0" }])}
+                >
+                  + Add Broker
+                </Button>
+              </div>
+
+              <label style={fieldLabelStyle}>Outside Broker</label>
+              <div>
+                {outsideBrokers.map((b, i) => (
+                  <div style={brokerRowStyle} key={i}>
+                    <div style={{ position: "relative", flex: 1 }}>
+                      <FontAwesomeIcon
+                        icon={faMagnifyingGlass}
+                        className="text-muted"
+                        style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}
+                      />
+                      <Input
+                        style={{ ...inputStyle, paddingLeft: 32 }}
+                        placeholder="Enter contact name or email"
+                        value={b.contact}
+                        onValueChange={(v) => updateOutsideBroker(i, "contact", v)}
+                      />
+                    </div>
+                    <Select
+                      items={PCT_ITEMS}
+                      value={b.pct || null}
+                      onValueChange={(v) => updateOutsideBroker(i, "pct", v ?? "")}
+                    >
+                      <SelectTrigger style={{ ...selectTriggerStyle, width: 64, flex: "0 0 auto", padding: "8px 6px" }}>
+                        <SelectValue placeholder="%" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PCT_ITEMS.map((item) => (
+                          <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      style={{ ...inputStyle, width: 90, flex: "0 0 auto" }}
+                      type="number"
+                      value={b.value}
+                      onValueChange={(v) => updateOutsideBroker(i, "value", v)}
+                    />
+                    {outsideBrokers.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        style={removeButtonStyle}
+                        onClick={() => setOutsideBrokers((rows) => rows.filter((_, idx) => idx !== i))}
+                      >
+                        <FontAwesomeIcon icon={faXmark} />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  style={addLinkStyle}
+                  onClick={() => setOutsideBrokers((rows) => [...rows, { contact: "", pct: "", value: "0" }])}
+                >
+                  + Add Broker
+                </Button>
+              </div>
 
               <RepeatableSection
                 title="Buyer"
+                required
                 addLabel="+ Add Buyer"
                 items={buyers.items}
                 onAdd={buyers.add}
                 onRemove={buyers.remove}
                 onChange={buyers.change}
                 emptyIcon={faUser}
-                emptyText="No buyers added yet"
+                emptyText="No Buyers have been added."
                 placeholder="Buyer name"
               />
 
               <RepeatableSection
                 title="Seller"
+                required
                 addLabel="+ Add Seller"
                 items={sellers.items}
                 onAdd={sellers.add}
                 onRemove={sellers.remove}
                 onChange={sellers.change}
                 emptyIcon={faUser}
-                emptyText="No sellers added yet"
+                emptyText="No Sellers have been added."
                 placeholder="Seller name"
               />
 
-              <RepeatableSection
-                title="Critical Dates"
-                addLabel="+ Add Critical Date"
-                items={criticalDates.items}
-                onAdd={criticalDates.add}
-                onRemove={criticalDates.remove}
-                onChange={criticalDates.change}
-                emptyIcon={faCalendarPlus}
-                emptyText="No critical dates added yet"
-                placeholder="e.g. Inspection Contingency — 03/15/2026"
-              />
+              <div style={{ ...sectionTitleRowStyle, justifyContent: "flex-start" }}>Critical Dates</div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>
+                  Close Date<span style={requiredStyle}>*</span>
+                </label>
+                <Input
+                  style={inputStyle}
+                  placeholder="MM/DD/YYYY"
+                  value={closeDate}
+                  onValueChange={setCloseDate}
+                />
+              </div>
 
               <div style={{ ...sectionTitleRowStyle, justifyContent: "flex-start" }}>Property</div>
               <div style={fieldWrapperStyle}>
-                <label style={fieldLabelStyle}>Address</label>
-                <Input style={inputStyle} value={address} onValueChange={setAddress} />
-              </div>
-              <div style={{ display: "flex", gap: 16, ...fieldWrapperStyle }}>
-                <div style={{ flex: 1 }}>
-                  <label style={fieldLabelStyle}>City</label>
-                  <Input style={inputStyle} value={city} onValueChange={setCity} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={fieldLabelStyle}>State</label>
-                  <Input style={inputStyle} value={propertyState} onValueChange={setPropertyState} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={fieldLabelStyle}>Zip</label>
-                  <Input style={inputStyle} value={zip} onValueChange={setZip} />
-                </div>
-              </div>
-              <div style={fieldWrapperStyle}>
-                <label style={fieldLabelStyle}>Property Type</label>
+                <label style={fieldLabelStyle}>
+                  Property Type<span style={requiredStyle}>*</span>
+                </label>
                 <Select
                   items={PROPERTY_TYPE_ITEMS}
                   value={propertyType || null}
@@ -508,54 +635,190 @@ function AddClosedDealModal({
                   </SelectContent>
                 </Select>
               </div>
-
-              <div style={{ ...sectionTitleRowStyle, justifyContent: "flex-start" }}>Transaction</div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>
+                  Property Subtype<span style={requiredStyle}>*</span>
+                </label>
+                <Select
+                  items={PROPERTY_SUBTYPE_ITEMS}
+                  value={propertySubtype || null}
+                  onValueChange={(v) => setPropertySubtype(v ?? "")}
+                >
+                  <SelectTrigger style={selectTriggerStyle}>
+                    <SelectValue placeholder="Select..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PROPERTY_SUBTYPE_ITEMS.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>Property Name</label>
+                <Input style={inputStyle} value={propertyName} onValueChange={setPropertyName} />
+              </div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>
+                  Address<span style={requiredStyle}>*</span>
+                </label>
+                <Input style={inputStyle} value={address} onValueChange={setAddress} />
+              </div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>Address 2</label>
+                <Input style={inputStyle} value={address2} onValueChange={setAddress2} />
+              </div>
               <div style={{ display: "flex", gap: 16, ...fieldWrapperStyle }}>
                 <div style={{ flex: 1 }}>
-                  <label style={fieldLabelStyle}>Transaction Value</label>
-                  <Input
-                    style={inputStyle}
-                    type="number"
-                    value={transactionValue}
-                    onValueChange={setTransactionValue}
-                  />
-                  {isNonDisclosureState(propertyState) && (
-                    <div style={{ color: MC.mutedIcon, fontSize: 12, marginTop: 4 }}>
-                      Sale Price will not appear in the Data Mining Report
-                    </div>
-                  )}
+                  <label style={fieldLabelStyle}>
+                    City<span style={requiredStyle}>*</span>
+                  </label>
+                  <Input style={inputStyle} value={city} onValueChange={setCity} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={fieldLabelStyle}>Close Date</label>
-                  <Input
-                    style={inputStyle}
-                    placeholder="MM/DD/YYYY"
-                    value={closeDate}
-                    onValueChange={setCloseDate}
-                  />
+                  <label style={fieldLabelStyle}>
+                    State<span style={requiredStyle}>*</span>
+                  </label>
+                  <Select
+                    items={STATE_ITEMS}
+                    value={propertyState || null}
+                    onValueChange={(v) => setPropertyState(v ?? "")}
+                  >
+                    <SelectTrigger style={selectTriggerStyle}>
+                      <SelectValue placeholder="Select..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STATE_ITEMS.map((item) => (
+                        <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={fieldLabelStyle}>Brokerage Gross</label>
-                  <Input
-                    style={inputStyle}
-                    type="number"
-                    value={brokerageGross}
-                    onValueChange={setBrokerageGross}
-                  />
+                  <label style={fieldLabelStyle}>
+                    Zip<span style={requiredStyle}>*</span>
+                  </label>
+                  <Input style={inputStyle} value={zip} onValueChange={setZip} />
                 </div>
               </div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>County</label>
+                <Input style={inputStyle} value={county} onValueChange={setCounty} />
+              </div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>
+                  Building Size (SF)<span style={requiredStyle}>*</span>
+                </label>
+                <Input style={inputStyle} type="number" value={buildingSize} onValueChange={setBuildingSize} />
+              </div>
 
-              <RepeatableSection
-                title="Custom Fields"
-                addLabel="+ Add Custom Field"
-                items={customFields.items}
-                onAdd={customFields.add}
-                onRemove={customFields.remove}
-                onChange={customFields.change}
-                emptyIcon={faSliders}
-                emptyText="No custom fields added yet"
-                placeholder="Field value"
-              />
+              <div style={{ ...sectionTitleRowStyle, justifyContent: "flex-start" }}>Transaction</div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>
+                  Sale Price<span style={requiredStyle}>*</span>
+                </label>
+                <Input style={inputStyle} type="number" value={salePrice} onValueChange={setSalePrice} />
+                {isNonDisclosureState(propertyState) && (
+                  <div style={{ color: MC.mutedIcon, fontSize: 12, marginTop: 4 }}>
+                    Sale Price will not appear in the Data Mining Report
+                  </div>
+                )}
+              </div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>Gross Commission %</label>
+                <Input
+                  style={inputStyle}
+                  type="number"
+                  value={grossCommissionPct}
+                  onValueChange={setGrossCommissionPct}
+                />
+              </div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>Gross Commission $</label>
+                <Input
+                  style={inputStyle}
+                  type="number"
+                  value={grossCommissionDollar}
+                  onValueChange={setGrossCommissionDollar}
+                />
+              </div>
+
+              <div style={{ ...sectionTitleRowStyle, justifyContent: "flex-start" }}>Custom Fields</div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>
+                  Transaction Type<span style={requiredStyle}>*</span>
+                </label>
+                <Select
+                  items={TRANSACTION_TYPE_ITEMS}
+                  value={transactionType || null}
+                  onValueChange={(v) => setTransactionType(v ?? "")}
+                >
+                  <SelectTrigger style={selectTriggerStyle}>
+                    <SelectValue placeholder="Select..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TRANSACTION_TYPE_ITEMS.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>
+                  Buyer/Tenant Company Type<span style={requiredStyle}>*</span>
+                </label>
+                <Input
+                  style={inputStyle}
+                  value={buyerTenantCompanyType}
+                  onValueChange={setBuyerTenantCompanyType}
+                />
+              </div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>
+                  Seller/Landlord Company Type<span style={requiredStyle}>*</span>
+                </label>
+                <Input
+                  style={inputStyle}
+                  value={sellerLandlordCompanyType}
+                  onValueChange={setSellerLandlordCompanyType}
+                />
+              </div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>
+                  Referral Source<span style={requiredStyle}>*</span>
+                </label>
+                <Input style={inputStyle} value={referralSource} onValueChange={setReferralSource} />
+              </div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>
+                  Operating Expenses<span style={requiredStyle}>*</span>
+                </label>
+                <Input
+                  style={inputStyle}
+                  type="number"
+                  value={operatingExpenses}
+                  onValueChange={setOperatingExpenses}
+                />
+              </div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>
+                  Confidential<span style={requiredStyle}>*</span>
+                </label>
+                <Select
+                  items={CONFIDENTIAL_ITEMS}
+                  value={confidential || null}
+                  onValueChange={(v) => setConfidential(v ?? "")}
+                >
+                  <SelectTrigger style={selectTriggerStyle}>
+                    <SelectValue placeholder="Select..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CONFIDENTIAL_ITEMS.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </>
           )}
         </ModalBody>
@@ -577,7 +840,7 @@ function AddClosedDealModal({
             Cancel
           </ModalClose>
           <Button variant="primary" onClick={() => onOpenChange(false)}>
-            Create Deal
+            Create
           </Button>
         </ModalFooter>
       </ModalContent>

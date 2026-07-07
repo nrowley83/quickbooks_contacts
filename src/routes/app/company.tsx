@@ -432,14 +432,14 @@ function CompanySection() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Department/Role</TableHead>
-                  <TableHead>Assigned User</TableHead>
+                  <TableHead style={{ width: "60%" }}>Assigned User</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 <TableRow>
                   <TableCell className="fw-bold">NAI Business Administrator (Role)</TableCell>
                   <TableCell>
-                    <select className="form-select form-select-sm" defaultValue="Jenny Broker">
+                    <select className="form-select" defaultValue="Jenny Broker">
                       <option>Jenny Broker</option>
                     </select>
                   </TableCell>
@@ -447,7 +447,7 @@ function CompanySection() {
                 <TableRow>
                   <TableCell className="fw-bold">NAI Communications Administrator Role (Role)</TableCell>
                   <TableCell>
-                    <select className="form-select form-select-sm" defaultValue="">
+                    <select className="form-select" defaultValue="">
                       <option value="" disabled>Select...</option>
                     </select>
                   </TableCell>

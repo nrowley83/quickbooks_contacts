@@ -281,7 +281,11 @@ function AddClosedDealModal({
 
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
-      <ModalContent size="lg" centered scrollable>
+      <ModalContent size="lg" scrollable className="add-closed-deal-content">
+        <style>{`
+          .modal-dialog:has(> .add-closed-deal-content) { margin-top: 60px; }
+          .modal-backdrop:has(~ .modal .add-closed-deal-content) { background-color: rgb(0, 0, 0); --bp-backdrop-opacity: 0.5; }
+        `}</style>
         <ModalHeader style={{ paddingTop: 24, paddingBottom: 0, paddingLeft: 32, paddingRight: 32 }}>
           <ModalTitle style={{ fontSize: 20, fontWeight: 700, color: MC.bodyText, margin: "0 0 20px" }}>
             Add Closed Deal

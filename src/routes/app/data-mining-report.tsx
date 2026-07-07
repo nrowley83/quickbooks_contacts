@@ -4,7 +4,39 @@ import {
   faMagnifyingGlass,
   faChevronLeft,
   faArrowUpWideShort,
+  faCaretDown,
 } from "@fortawesome/pro-regular-svg-icons";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+} from "@buildoutinc/blueprint-react/ui/Breadcrumb";
+import { Button } from "@buildoutinc/blueprint-react/ui/Button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@buildoutinc/blueprint-react/ui/DropdownMenu";
+import { Field, FieldLabel } from "@buildoutinc/blueprint-react/ui/Field";
+import { Input } from "@buildoutinc/blueprint-react/ui/Input";
+import { InputGroup, InputGroupAddon } from "@buildoutinc/blueprint-react/ui/InputGroup";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@buildoutinc/blueprint-react/ui/Select";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@buildoutinc/blueprint-react/ui/Table";
 
 export const Route = createFileRoute("/app/data-mining-report")({
   component: DataMiningReportPage,
@@ -58,129 +90,141 @@ const SUMMARY_ROW = HEADERS.map((h) => {
 function DataMiningReportPage() {
   return (
     <div className="container-fluid py-4 px-5" style={{ fontSize: 14 }}>
-      <Link
-        to="/app/reports"
-        className="text-decoration-none d-inline-flex align-items-center gap-1 mb-3"
-        style={{ fontSize: 14, fontWeight: 500 }}
-      >
-        <FontAwesomeIcon icon={faChevronLeft} style={{ fontSize: 11 }} />
-        Standard Reports
-      </Link>
+      <Breadcrumb className="mb-3">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink render={<Link to="/app/reports" />}>
+              <FontAwesomeIcon icon={faChevronLeft} style={{ fontSize: 11 }} />
+              Standard Reports
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
       <div className="d-flex align-items-center justify-content-between mb-4">
         <h4 className="fw-bold mb-0">Data Mining Report</h4>
         <div className="d-flex gap-2">
-          <button className="btn btn-primary">Actions ▾</button>
-          <button className="btn" style={{ background: "rgb(242,232,254)", color: "rgb(54,9,99)" }}>
-            Save ▾
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button variant="primary">
+                  Actions
+                  <FontAwesomeIcon icon={faCaretDown} />
+                </Button>
+              }
+            />
+            <DropdownMenuContent>
+              <DropdownMenuItem>Export to Excel</DropdownMenuItem>
+              <DropdownMenuItem>Export to PDF</DropdownMenuItem>
+              <DropdownMenuItem>Print</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button variant="secondary">
+                  Save
+                  <FontAwesomeIcon icon={faCaretDown} />
+                </Button>
+              }
+            />
+            <DropdownMenuContent>
+              <DropdownMenuItem>Save</DropdownMenuItem>
+              <DropdownMenuItem>Save As New</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
       <div className="d-flex align-items-end flex-wrap gap-4 mb-4">
-        <div className="d-flex flex-column gap-1">
-          <label className="fw-semibold" style={{ fontSize: 13 }}>Name, Address or Identifier</label>
-          <div className="position-relative">
-            <FontAwesomeIcon
-              icon={faMagnifyingGlass}
-              className="position-absolute text-muted"
-              style={{ left: 10, top: "50%", transform: "translateY(-50%)", fontSize: 12 }}
-            />
-            <input type="text" className="form-control ps-4" style={{ minWidth: 200 }} />
-          </div>
-        </div>
-        <div className="d-flex flex-column gap-1">
-          <label className="fw-semibold" style={{ fontSize: 13 }}>Company</label>
-          <select className="form-select" style={{ minWidth: 160 }} defaultValue="NAI Demo">
-            <option>NAI Demo</option>
-          </select>
-        </div>
-        <div className="d-flex flex-column gap-1">
-          <label className="fw-semibold" style={{ fontSize: 13 }}>Deal Type</label>
-          <select className="form-select" style={{ minWidth: 160 }} defaultValue="Any">
-            <option>Any</option>
-          </select>
-        </div>
-        <div className="d-flex flex-column gap-1">
-          <label className="fw-semibold" style={{ fontSize: 13 }}>Property Type</label>
-          <select className="form-select" style={{ minWidth: 160 }} defaultValue="Any">
-            <option>Any</option>
-          </select>
-        </div>
-        <div className="d-flex flex-column gap-1">
-          <label className="fw-semibold" style={{ fontSize: 13 }}>Close Date</label>
+        <Field>
+          <FieldLabel>Name, Address or Identifier</FieldLabel>
+          <InputGroup style={{ minWidth: 200 }}>
+            <InputGroupAddon>
+              <FontAwesomeIcon icon={faMagnifyingGlass} />
+            </InputGroupAddon>
+            <Input />
+          </InputGroup>
+        </Field>
+
+        <Field>
+          <FieldLabel>Company</FieldLabel>
+          <Select items={[{ label: "NAI Demo", value: "nai-demo" }]} defaultValue="nai-demo">
+            <SelectTrigger style={{ minWidth: 160 }}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="nai-demo">NAI Demo</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
+
+        <Field>
+          <FieldLabel>Deal Type</FieldLabel>
+          <Select items={[{ label: "Any", value: "any" }]} defaultValue="any">
+            <SelectTrigger style={{ minWidth: 160 }}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="any">Any</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
+
+        <Field>
+          <FieldLabel>Property Type</FieldLabel>
+          <Select items={[{ label: "Any", value: "any" }]} defaultValue="any">
+            <SelectTrigger style={{ minWidth: 160 }}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="any">Any</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
+
+        <Field>
+          <FieldLabel>Close Date</FieldLabel>
           <div className="d-flex gap-2">
-            <input type="text" className="form-control" placeholder="Start Date" style={{ minWidth: 110 }} />
-            <input type="text" className="form-control" placeholder="End Date" style={{ minWidth: 110 }} />
+            <Input placeholder="Start Date" style={{ minWidth: 110 }} />
+            <Input placeholder="End Date" style={{ minWidth: 110 }} />
           </div>
-        </div>
-        <button
-          className="btn btn-link p-0 text-primary text-decoration-none fw-semibold"
-          style={{ paddingBottom: 9 }}
-        >
+        </Field>
+
+        <Button variant="ghost" style={{ paddingBottom: 9 }}>
           Reset Filter
-        </button>
+        </Button>
       </div>
 
-      <div className="border rounded overflow-auto">
-        <table className="mb-0" style={{ borderCollapse: "collapse", width: "100%", minWidth: 2400 }}>
-          <thead>
-            <tr>
-              {HEADERS.map((h) => (
-                <th
-                  key={h}
-                  className="bg-white fw-semibold text-nowrap"
-                  style={{
-                    padding: "8px 12px",
-                    borderBottom: "1px solid var(--bs-border-color)",
-                    borderRight: "1px solid var(--bs-border-color)",
-                    textAlign: "left",
-                    position: "sticky",
-                    top: 0,
-                  }}
-                >
-                  {h}
-                  <FontAwesomeIcon icon={faArrowUpWideShort} className="text-muted ms-1" style={{ fontSize: 11 }} />
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            <tr style={{ background: "rgb(242,232,254)" }}>
-              {SUMMARY_ROW.map((v, i) => (
-                <td
-                  key={i}
-                  className="text-nowrap fw-bold"
-                  style={{
-                    padding: "8px 12px",
-                    borderBottom: "2px solid var(--bs-border-color)",
-                    borderRight: "1px solid var(--bs-border-color)",
-                  }}
-                >
-                  {v}
-                </td>
-              ))}
-            </tr>
-            {ROWS.map((row, ri) => (
-              <tr key={ri}>
-                {row.map((cell, ci) => (
-                  <td
-                    key={ci}
-                    className="text-nowrap"
-                    style={{
-                      padding: "8px 12px",
-                      borderBottom: "1px solid var(--bs-border-color)",
-                      borderRight: "1px solid var(--bs-border-color)",
-                    }}
-                  >
-                    {cell === "" ? "--" : cell}
-                  </td>
-                ))}
-              </tr>
+      <style>{`.data-mining-table { min-width: 2400px; }`}</style>
+      <Table variant="bordered" className="data-mining-table">
+        <TableHeader sticky>
+          <TableRow>
+            {HEADERS.map((h) => (
+              <TableHead key={h} className="text-nowrap">
+                {h}
+                <FontAwesomeIcon icon={faArrowUpWideShort} className="text-muted ms-1" style={{ fontSize: 11 }} />
+              </TableHead>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow className="bg-purple-heart-50 fw-bold">
+            {SUMMARY_ROW.map((v, i) => (
+              <TableCell key={i} className="text-nowrap">{v}</TableCell>
+            ))}
+          </TableRow>
+          {ROWS.map((row, ri) => (
+            <TableRow key={ri}>
+              {row.map((cell, ci) => (
+                <TableCell key={ci} className="text-nowrap">
+                  {cell === "" ? "--" : cell}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
       <div className="text-muted mt-2" style={{ fontSize: 13 }}>Count: {ROWS.length}</div>
     </div>

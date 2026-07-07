@@ -194,6 +194,29 @@ const PROPERTY_TYPE_ITEMS = [
   { label: "Land", value: "Land" },
 ];
 
+const NON_DISCLOSURE_STATES = [
+  { name: "Alaska", abbr: "AK" },
+  { name: "Idaho", abbr: "ID" },
+  { name: "Kansas", abbr: "KS" },
+  { name: "Louisiana", abbr: "LA" },
+  { name: "Mississippi", abbr: "MS" },
+  { name: "Missouri", abbr: "MO" },
+  { name: "Montana", abbr: "MT" },
+  { name: "New Mexico", abbr: "NM" },
+  { name: "North Dakota", abbr: "ND" },
+  { name: "Texas", abbr: "TX" },
+  { name: "Utah", abbr: "UT" },
+  { name: "Wyoming", abbr: "WY" },
+];
+
+function isNonDisclosureState(value: string): boolean {
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) return false;
+  return NON_DISCLOSURE_STATES.some(
+    (s) => s.name.toLowerCase() === normalized || s.abbr.toLowerCase() === normalized
+  );
+}
+
 type BrokerRow = { broker: string; pct: string };
 
 function RepeatableSection({
@@ -496,6 +519,11 @@ function AddClosedDealModal({
                     value={transactionValue}
                     onValueChange={setTransactionValue}
                   />
+                  {isNonDisclosureState(propertyState) && (
+                    <div style={{ color: MC.mutedIcon, fontSize: 12, marginTop: 4 }}>
+                      Sale Price will not appear in the Data Mining Report
+                    </div>
+                  )}
                 </div>
                 <div style={{ flex: 1 }}>
                   <label style={fieldLabelStyle}>Close Date</label>

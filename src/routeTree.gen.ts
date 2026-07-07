@@ -15,6 +15,7 @@ import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppReportsRouteImport } from './routes/app/reports'
 import { Route as AppQuickbooksContactSyncRouteImport } from './routes/app/quickbooks-contact-sync'
 import { Route as AppPayablesRouteImport } from './routes/app/payables'
+import { Route as AppDataMiningReportRouteImport } from './routes/app/data-mining-report'
 import { Route as AppCompanyRouteImport } from './routes/app/company'
 
 const AppRoute = AppRouteImport.update({
@@ -48,6 +49,11 @@ const AppPayablesRoute = AppPayablesRouteImport.update({
   path: '/payables',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDataMiningReportRoute = AppDataMiningReportRouteImport.update({
+  id: '/data-mining-report',
+  path: '/data-mining-report',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCompanyRoute = AppCompanyRouteImport.update({
   id: '/company',
   path: '/company',
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/app/company': typeof AppCompanyRoute
+  '/app/data-mining-report': typeof AppDataMiningReportRoute
   '/app/payables': typeof AppPayablesRoute
   '/app/quickbooks-contact-sync': typeof AppQuickbooksContactSyncRoute
   '/app/reports': typeof AppReportsRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app/company': typeof AppCompanyRoute
+  '/app/data-mining-report': typeof AppDataMiningReportRoute
   '/app/payables': typeof AppPayablesRoute
   '/app/quickbooks-contact-sync': typeof AppQuickbooksContactSyncRoute
   '/app/reports': typeof AppReportsRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/app/company': typeof AppCompanyRoute
+  '/app/data-mining-report': typeof AppDataMiningReportRoute
   '/app/payables': typeof AppPayablesRoute
   '/app/quickbooks-contact-sync': typeof AppQuickbooksContactSyncRoute
   '/app/reports': typeof AppReportsRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/app/company'
+    | '/app/data-mining-report'
     | '/app/payables'
     | '/app/quickbooks-contact-sync'
     | '/app/reports'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/app/company'
+    | '/app/data-mining-report'
     | '/app/payables'
     | '/app/quickbooks-contact-sync'
     | '/app/reports'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/app/company'
+    | '/app/data-mining-report'
     | '/app/payables'
     | '/app/quickbooks-contact-sync'
     | '/app/reports'
@@ -159,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPayablesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/data-mining-report': {
+      id: '/app/data-mining-report'
+      path: '/data-mining-report'
+      fullPath: '/app/data-mining-report'
+      preLoaderRoute: typeof AppDataMiningReportRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/company': {
       id: '/app/company'
       path: '/company'
@@ -171,6 +190,7 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppCompanyRoute: typeof AppCompanyRoute
+  AppDataMiningReportRoute: typeof AppDataMiningReportRoute
   AppPayablesRoute: typeof AppPayablesRoute
   AppQuickbooksContactSyncRoute: typeof AppQuickbooksContactSyncRoute
   AppReportsRoute: typeof AppReportsRoute
@@ -179,6 +199,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppCompanyRoute: AppCompanyRoute,
+  AppDataMiningReportRoute: AppDataMiningReportRoute,
   AppPayablesRoute: AppPayablesRoute,
   AppQuickbooksContactSyncRoute: AppQuickbooksContactSyncRoute,
   AppReportsRoute: AppReportsRoute,

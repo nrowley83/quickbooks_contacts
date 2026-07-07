@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -105,6 +105,7 @@ type ReportItem = {
   icon: IconDefinition;
   title: string;
   description: string;
+  href?: string;
 };
 
 type ReportSection = {
@@ -142,6 +143,7 @@ const sections: ReportSection[] = [
         icon: faHandshake,
         title: "Data Mining Report",
         description: "Report on closed deal data across the CRE market.",
+        href: "/app/data-mining-report",
       },
       {
         icon: faHandshake,
@@ -381,8 +383,8 @@ function ReportsPage() {
                     {section.heading}
                   </h6>
                   <div className="d-flex flex-column gap-3">
-                    {section.reports.map((report) => (
-                      <div key={report.title}>
+                    {section.reports.map((report) => {
+                      const cardBody = (
                         <div className="card">
                           <div className="card-body">
                             <div className="row">
@@ -406,8 +408,19 @@ function ReportsPage() {
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                      return (
+                        <div key={report.title}>
+                          {report.href ? (
+                            <Link to={report.href} className="text-decoration-none text-body">
+                              {cardBody}
+                            </Link>
+                          ) : (
+                            cardBody
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               ))}

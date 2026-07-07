@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass, faChevronLeft } from "@fortawesome/pro-regular-svg-icons";
+import { faMagnifyingGlass, faChevronLeft, faSort } from "@fortawesome/pro-regular-svg-icons";
 
 export const Route = createFileRoute("/app/data-mining-report")({
   component: DataMiningReportPage,
@@ -125,27 +125,33 @@ function DataMiningReportPage() {
               {HEADERS.map((h) => (
                 <th
                   key={h}
-                  className="bg-light fw-semibold text-nowrap"
+                  className="bg-white fw-semibold text-nowrap"
                   style={{
                     padding: "8px 12px",
                     borderBottom: "1px solid var(--bs-border-color)",
+                    borderRight: "1px solid var(--bs-border-color)",
                     textAlign: "left",
                     position: "sticky",
                     top: 0,
                   }}
                 >
                   {h}
+                  <FontAwesomeIcon icon={faSort} className="text-muted ms-1" style={{ fontSize: 11 }} />
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            <tr className="fw-bold" style={{ background: "var(--bs-light)" }}>
+            <tr style={{ background: "rgb(242,232,254)" }}>
               {SUMMARY_ROW.map((v, i) => (
                 <td
                   key={i}
-                  className="text-nowrap"
-                  style={{ padding: "8px 12px", borderBottom: "2px solid var(--bs-border-color)" }}
+                  className="text-nowrap fw-bold"
+                  style={{
+                    padding: "8px 12px",
+                    borderBottom: "2px solid var(--bs-border-color)",
+                    borderRight: "1px solid var(--bs-border-color)",
+                  }}
                 >
                   {v}
                 </td>
@@ -157,7 +163,11 @@ function DataMiningReportPage() {
                   <td
                     key={ci}
                     className="text-nowrap"
-                    style={{ padding: "8px 12px", borderBottom: "1px solid var(--bs-border-color)" }}
+                    style={{
+                      padding: "8px 12px",
+                      borderBottom: "1px solid var(--bs-border-color)",
+                      borderRight: "1px solid var(--bs-border-color)",
+                    }}
                   >
                     {cell === "" ? "--" : cell}
                   </td>

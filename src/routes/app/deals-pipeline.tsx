@@ -76,6 +76,100 @@ const DEALS = [
 ];
 
 // ─── Add Closed Deal modal ────────────────────────────────────────────────────
+// Styles below mirror add_closed_deal_modal.css values exactly (colors, sizes,
+// spacing) rather than approximating with Bootstrap's utility scale, which
+// this theme customizes and does not map 1:1 to the spec's px values.
+
+const MC = {
+  bodyText: "rgb(33, 38, 48)",
+  border: "oklch(0.8869 0.01 259.82)",
+  required: "oklch(0.583 0.24 28.48)",
+  purple: "oklch(0.4835 0.24 298.01)",
+  mutedIcon: "rgb(154, 161, 176)",
+};
+
+const fieldWrapperStyle: React.CSSProperties = { marginBottom: 16 };
+
+const fieldLabelStyle: React.CSSProperties = {
+  display: "block",
+  fontSize: 14,
+  fontWeight: 400,
+  color: MC.bodyText,
+  marginBottom: 6,
+};
+
+const requiredStyle: React.CSSProperties = { color: MC.required, marginLeft: 2 };
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  border: `1px solid ${MC.border}`,
+  borderRadius: 6,
+  padding: "8px 12px",
+  fontSize: 14,
+  fontFamily: "inherit",
+  color: MC.bodyText,
+  background: "rgb(255, 255, 255)",
+  height: 37,
+};
+
+const selectChevron =
+  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 10l5 5 5-5z' fill='%23212630'/></svg>\")";
+
+const selectStyle: React.CSSProperties = {
+  ...inputStyle,
+  paddingRight: 36,
+  backgroundImage: selectChevron,
+  backgroundRepeat: "no-repeat",
+  backgroundPosition: "right 10px center",
+  backgroundSize: "16px",
+  appearance: "none",
+};
+
+const sectionTitleRowStyle: React.CSSProperties = {
+  fontSize: 20,
+  fontWeight: 400,
+  color: MC.bodyText,
+  margin: "24px 0 16px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+};
+
+const addLinkStyle: React.CSSProperties = {
+  color: MC.purple,
+  fontSize: 14,
+  fontWeight: 400,
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 4,
+  background: "none",
+  border: "none",
+  padding: 0,
+  cursor: "pointer",
+};
+
+const removeButtonStyle: React.CSSProperties = {
+  background: "none",
+  border: "none",
+  padding: "0 8px",
+  color: MC.mutedIcon,
+  cursor: "pointer",
+  flex: "0 0 auto",
+};
+
+const brokerRowStyle: React.CSSProperties = { display: "flex", gap: 8, marginBottom: 6 };
+
+const emptyStateBoxStyle: React.CSSProperties = {
+  border: `1px dashed ${MC.border}`,
+  borderRadius: 6,
+  padding: 20,
+  background: "rgb(255, 255, 255)",
+  display: "flex",
+  alignItems: "center",
+  gap: 16,
+  color: MC.bodyText,
+  fontSize: 14,
+};
 
 const BROKER_OPTIONS = ["Bill Broker", "Jenny Broker", "Brian Reynolds", "May Broker"];
 const PCT_OPTIONS = ["10%", "20%", "25%", "50%", "75%", "100%"];
@@ -105,30 +199,28 @@ function RepeatableSection({
 }) {
   return (
     <>
-      <div className="d-flex align-items-center justify-content-between mt-4 mb-3">
-        <h6 className="fw-normal fs-5 mb-0">{title}</h6>
-        <Button variant="ghost" size="sm" className="text-primary" onClick={onAdd}>
+      <div style={sectionTitleRowStyle}>
+        <span>{title}</span>
+        <button type="button" style={addLinkStyle} onClick={onAdd}>
           {addLabel}
-        </Button>
+        </button>
       </div>
       {items.length === 0 ? (
-        <div
-          className="border rounded p-3 d-flex align-items-center gap-3"
-          style={{ borderStyle: "dashed" }}
-        >
-          <FontAwesomeIcon icon={emptyIcon} className="text-primary" style={{ fontSize: 20 }} />
+        <div style={emptyStateBoxStyle}>
+          <FontAwesomeIcon icon={emptyIcon} style={{ width: 24, height: 24, color: MC.purple }} />
           <span>{emptyText}</span>
         </div>
       ) : (
-        <div className="d-flex flex-column gap-2">
+        <div>
           {items.map((val, i) => (
-            <div className="d-flex gap-2" key={i}>
+            <div style={brokerRowStyle} key={i}>
               <Input
+                style={{ ...inputStyle, flex: 1 }}
                 placeholder={placeholder}
                 value={val}
                 onValueChange={(v) => onChange(i, v)}
               />
-              <button className="btn btn-link text-muted p-0 px-2" onClick={() => onRemove(i)}>
+              <button type="button" style={removeButtonStyle} onClick={() => onRemove(i)}>
                 <FontAwesomeIcon icon={faXmark} />
               </button>
             </div>
@@ -190,17 +282,19 @@ function AddClosedDealModal({
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
       <ModalContent size="lg" centered scrollable>
-        <ModalHeader className="border-bottom pb-3">
-          <ModalTitle style={{ fontSize: 20 }}>Add Closed Deal</ModalTitle>
+        <ModalHeader style={{ paddingTop: 24, paddingBottom: 0, paddingLeft: 32, paddingRight: 32 }}>
+          <ModalTitle style={{ fontSize: 20, fontWeight: 700, color: MC.bodyText, margin: "0 0 20px" }}>
+            Add Closed Deal
+          </ModalTitle>
         </ModalHeader>
 
-        <ModalBody className="py-4">
-          <div className="mb-3">
-            <label className="form-label">
-              Deal Type<span className="text-danger ms-1">*</span>
+        <ModalBody style={{ paddingTop: 0, paddingBottom: 0, paddingLeft: 32, paddingRight: 32 }}>
+          <div style={fieldWrapperStyle}>
+            <label style={fieldLabelStyle}>
+              Deal Type<span style={requiredStyle}>*</span>
             </label>
             <select
-              className="form-select"
+              style={selectStyle}
               value={dealType}
               onChange={(e) => setDealType(e.target.value)}
             >
@@ -212,36 +306,40 @@ function AddClosedDealModal({
 
           {isSale && (
             <>
-              <h6 className="fw-normal fs-5 mt-4 mb-3">Deal Details</h6>
-              <div className="row g-3">
-                <div className="col-6">
-                  <label className="form-label">
-                    Deal Title<span className="text-danger ms-1">*</span>
+              <div style={{ ...sectionTitleRowStyle, justifyContent: "flex-start" }}>Deal Details</div>
+              <div style={{ display: "flex", gap: 16, ...fieldWrapperStyle }}>
+                <div style={{ flex: 1 }}>
+                  <label style={fieldLabelStyle}>
+                    Deal Title<span style={requiredStyle}>*</span>
                   </label>
-                  <Input value={dealTitle} onValueChange={setDealTitle} />
+                  <Input style={inputStyle} value={dealTitle} onValueChange={setDealTitle} />
                 </div>
-                <div className="col-6">
-                  <label className="form-label">Deal ID</label>
-                  <Input value={dealId} onValueChange={setDealId} placeholder="Auto-generated" />
+                <div style={{ flex: 1 }}>
+                  <label style={fieldLabelStyle}>Deal ID</label>
+                  <Input
+                    style={inputStyle}
+                    value={dealId}
+                    onValueChange={setDealId}
+                    placeholder="Auto-generated"
+                  />
                 </div>
               </div>
 
-              <div className="d-flex align-items-center justify-content-between mt-4 mb-3">
-                <h6 className="fw-normal fs-5 mb-0">Brokers</h6>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-primary"
+              <div style={sectionTitleRowStyle}>
+                <span>Brokers</span>
+                <button
+                  type="button"
+                  style={addLinkStyle}
                   onClick={() => setBrokers((rows) => [...rows, { broker: BROKER_OPTIONS[0], pct: "10%" }])}
                 >
                   + Add Broker
-                </Button>
+                </button>
               </div>
-              <div className="d-flex flex-column gap-2">
+              <div>
                 {brokers.map((b, i) => (
-                  <div className="d-flex gap-2" key={i}>
+                  <div style={brokerRowStyle} key={i}>
                     <select
-                      className="form-select flex-grow-1"
+                      style={{ ...selectStyle, flex: 1 }}
                       value={b.broker}
                       onChange={(e) => updateBroker(i, "broker", e.target.value)}
                     >
@@ -250,8 +348,7 @@ function AddClosedDealModal({
                       ))}
                     </select>
                     <select
-                      className="form-select"
-                      style={{ width: 80 }}
+                      style={{ ...selectStyle, width: 64, flex: "0 0 auto" }}
                       value={b.pct}
                       onChange={(e) => updateBroker(i, "pct", e.target.value)}
                     >
@@ -259,12 +356,13 @@ function AddClosedDealModal({
                         <option key={pct} value={pct}>{pct}</option>
                       ))}
                     </select>
-                    <div className="form-control text-end text-muted" style={{ width: 90 }}>
+                    <div style={{ width: 80, flex: "0 0 auto", textAlign: "right", paddingTop: 8 }}>
                       {brokerValue(b.pct)}
                     </div>
                     {brokers.length > 1 && (
                       <button
-                        className="btn btn-link text-muted p-0 px-2"
+                        type="button"
+                        style={removeButtonStyle}
                         onClick={() => setBrokers((rows) => rows.filter((_, idx) => idx !== i))}
                       >
                         <FontAwesomeIcon icon={faXmark} />
@@ -310,57 +408,64 @@ function AddClosedDealModal({
                 placeholder="e.g. Inspection Contingency — 03/15/2026"
               />
 
-              <h6 className="fw-normal fs-5 mt-4 mb-3">Property</h6>
-              <div className="row g-3">
-                <div className="col-12">
-                  <label className="form-label">Address</label>
-                  <Input value={address} onValueChange={setAddress} />
+              <div style={{ ...sectionTitleRowStyle, justifyContent: "flex-start" }}>Property</div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>Address</label>
+                <Input style={inputStyle} value={address} onValueChange={setAddress} />
+              </div>
+              <div style={{ display: "flex", gap: 16, ...fieldWrapperStyle }}>
+                <div style={{ flex: 1 }}>
+                  <label style={fieldLabelStyle}>City</label>
+                  <Input style={inputStyle} value={city} onValueChange={setCity} />
                 </div>
-                <div className="col-4">
-                  <label className="form-label">City</label>
-                  <Input value={city} onValueChange={setCity} />
+                <div style={{ flex: 1 }}>
+                  <label style={fieldLabelStyle}>State</label>
+                  <Input style={inputStyle} value={propertyState} onValueChange={setPropertyState} />
                 </div>
-                <div className="col-4">
-                  <label className="form-label">State</label>
-                  <Input value={propertyState} onValueChange={setPropertyState} />
-                </div>
-                <div className="col-4">
-                  <label className="form-label">Zip</label>
-                  <Input value={zip} onValueChange={setZip} />
-                </div>
-                <div className="col-6">
-                  <label className="form-label">Property Type</label>
-                  <select
-                    className="form-select"
-                    value={propertyType}
-                    onChange={(e) => setPropertyType(e.target.value)}
-                  >
-                    <option value="" disabled>Select...</option>
-                    <option value="Office">Office</option>
-                    <option value="Retail">Retail</option>
-                    <option value="Industrial">Industrial</option>
-                    <option value="Land">Land</option>
-                  </select>
+                <div style={{ flex: 1 }}>
+                  <label style={fieldLabelStyle}>Zip</label>
+                  <Input style={inputStyle} value={zip} onValueChange={setZip} />
                 </div>
               </div>
+              <div style={fieldWrapperStyle}>
+                <label style={fieldLabelStyle}>Property Type</label>
+                <select
+                  style={selectStyle}
+                  value={propertyType}
+                  onChange={(e) => setPropertyType(e.target.value)}
+                >
+                  <option value="" disabled>Select...</option>
+                  <option value="Office">Office</option>
+                  <option value="Retail">Retail</option>
+                  <option value="Industrial">Industrial</option>
+                  <option value="Land">Land</option>
+                </select>
+              </div>
 
-              <h6 className="fw-normal fs-5 mt-4 mb-3">Transaction</h6>
-              <div className="row g-3">
-                <div className="col-4">
-                  <label className="form-label">Transaction Value</label>
+              <div style={{ ...sectionTitleRowStyle, justifyContent: "flex-start" }}>Transaction</div>
+              <div style={{ display: "flex", gap: 16, ...fieldWrapperStyle }}>
+                <div style={{ flex: 1 }}>
+                  <label style={fieldLabelStyle}>Transaction Value</label>
                   <Input
+                    style={inputStyle}
                     type="number"
                     value={transactionValue}
                     onValueChange={setTransactionValue}
                   />
                 </div>
-                <div className="col-4">
-                  <label className="form-label">Close Date</label>
-                  <Input placeholder="MM/DD/YYYY" value={closeDate} onValueChange={setCloseDate} />
-                </div>
-                <div className="col-4">
-                  <label className="form-label">Brokerage Gross</label>
+                <div style={{ flex: 1 }}>
+                  <label style={fieldLabelStyle}>Close Date</label>
                   <Input
+                    style={inputStyle}
+                    placeholder="MM/DD/YYYY"
+                    value={closeDate}
+                    onValueChange={setCloseDate}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={fieldLabelStyle}>Brokerage Gross</label>
+                  <Input
+                    style={inputStyle}
                     type="number"
                     value={brokerageGross}
                     onValueChange={setBrokerageGross}
@@ -383,7 +488,19 @@ function AddClosedDealModal({
           )}
         </ModalBody>
 
-        <ModalFooter className="d-flex justify-content-end gap-2 border-top pt-3">
+        <ModalFooter
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 10,
+            marginTop: 24,
+            paddingTop: 16,
+            paddingBottom: 20,
+            paddingLeft: 32,
+            paddingRight: 32,
+            borderTop: `1px solid ${MC.border}`,
+          }}
+        >
           <ModalClose render={<button className="btn btn-link text-decoration-none" />}>
             Cancel
           </ModalClose>

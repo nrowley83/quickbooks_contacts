@@ -23,6 +23,9 @@ import {
   faCircleMinus,
   faXmark,
   faMagnifyingGlass,
+  faCircleInfo,
+  faPaintbrushPencil,
+  faEllipsis,
 } from "@fortawesome/pro-regular-svg-icons";
 import {
   Modal,
@@ -351,10 +354,218 @@ function AssignUsersModal({
   );
 }
 
+// ─── Company section ──────────────────────────────────────────────────────────
+
+function CompanySection() {
+  return (
+    <Tabs defaultValue="settings">
+      <TabsList className="mb-4">
+        <Tab value="settings" icon={<FontAwesomeIcon icon={faCircleInfo} />}>
+          Settings
+        </Tab>
+        <Tab value="styles" icon={<FontAwesomeIcon icon={faPaintbrushPencil} />}>
+          Styles
+        </Tab>
+      </TabsList>
+
+      <TabPanel value="settings">
+        {/* Company Information */}
+        <section className="mb-4">
+          <h5 className="fw-bold mb-3">Company Information</h5>
+          <div className="row g-3">
+            <div className="col-6">
+              <label className="form-label fw-medium">
+                Company Name<span className="text-danger">*</span>
+              </label>
+              <input type="text" className="form-control" defaultValue="NAI Demo" />
+            </div>
+            <div className="col-6">
+              <label className="form-label fw-medium">Company Email Address</label>
+              <input type="email" className="form-control" defaultValue="staging@buildout.com" />
+            </div>
+
+            <div className="col-6">
+              <label className="form-label fw-medium">Salesforce ID</label>
+              <div className="input-group">
+                <input type="text" className="form-control" defaultValue="00013700003mZtc" />
+                <button className="btn btn-danger" type="button">
+                  <FontAwesomeIcon icon={faEllipsis} style={{ fontSize: 12 }} />
+                </button>
+              </div>
+            </div>
+            <div className="col-6">
+              <label className="form-label fw-medium">Admin Email Addresses</label>
+              <input type="text" className="form-control" />
+              <div className="form-text">Copied on Syndication email updates, if desired.</div>
+            </div>
+
+            <div className="col-6">
+              <label className="form-label fw-medium">Website</label>
+              <input type="text" className="form-control" defaultValue="http://naidemo.com" />
+            </div>
+          </div>
+        </section>
+
+        <hr className="my-4" />
+
+        {/* Specialties / Sub-Specialties / Territories */}
+        <section className="mb-4">
+          <h5 className="fw-bold mb-3">Specialties</h5>
+          <select className="form-select" defaultValue="">
+            <option value="" disabled>Select...</option>
+          </select>
+        </section>
+
+        <section className="mb-4">
+          <h5 className="fw-bold mb-3">Sub-Specialties</h5>
+          <select className="form-select" defaultValue="">
+            <option value="" disabled>Select...</option>
+          </select>
+        </section>
+
+        <section className="mb-4">
+          <h5 className="fw-bold mb-3">Territories</h5>
+          <select className="form-select" disabled defaultValue="">
+            <option value="" disabled>Select...</option>
+          </select>
+        </section>
+
+        <hr className="my-4" />
+
+        {/* Department & Role Contacts */}
+        <section className="mb-4">
+          <h5 className="fw-bold mb-3">Department &amp; Role Contacts</h5>
+          <div className="border rounded overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Department/Role</TableHead>
+                  <TableHead>Assigned User</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="fw-bold">NAI Business Administrator (Role)</TableCell>
+                  <TableCell>
+                    <select className="form-select form-select-sm" defaultValue="Jenny Broker">
+                      <option>Jenny Broker</option>
+                    </select>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="fw-bold">NAI Communications Administrator Role (Role)</TableCell>
+                  <TableCell>
+                    <select className="form-select form-select-sm" defaultValue="">
+                      <option value="" disabled>Select...</option>
+                    </select>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        </section>
+
+        <hr className="my-4" />
+
+        {/* Regions */}
+        <section className="mb-4">
+          <h5 className="fw-bold mb-3">Regions</h5>
+          <div className="row g-3">
+            <div className="col-6">
+              <label className="form-label fw-medium">Primary Company Region</label>
+              <select className="form-select" disabled defaultValue="none">
+                <option value="none">- No region assigned -</option>
+              </select>
+            </div>
+            <div className="col-6">
+              <label className="form-label fw-medium">Secondary Company Region</label>
+              <select className="form-select" disabled defaultValue="none">
+                <option value="none">- No region assigned -</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <hr className="my-4" />
+
+        {/* Social Media */}
+        <section className="mb-4">
+          <h5 className="fw-bold mb-3">Social Media</h5>
+          <div className="row g-3">
+            <div className="col-6">
+              <label className="form-label fw-medium">Facebook URL</label>
+              <input type="text" className="form-control" defaultValue="https://www.facebook.com/" />
+            </div>
+            <div className="col-6">
+              <label className="form-label fw-medium">LinkedIn URL</label>
+              <input type="text" className="form-control" defaultValue="https://www.linkedin.com" />
+            </div>
+            <div className="col-6">
+              <label className="form-label fw-medium">Twitter/X URL</label>
+              <input type="text" className="form-control" defaultValue="https://www.twitter.com" />
+            </div>
+            <div className="col-6">
+              <label className="form-label fw-medium">YouTube URL</label>
+              <input type="text" className="form-control" defaultValue="https://www.youtube.com" />
+            </div>
+          </div>
+        </section>
+
+        <hr className="my-4" />
+
+        {/* Disclaimer */}
+        <section className="mb-4">
+          <h5 className="fw-bold mb-3">Disclaimer</h5>
+          <textarea
+            className="form-control"
+            rows={4}
+            defaultValue="No Warranty Or Representation, Express Or Implied, Is Made As To The Accuracy Of The Information Contained Herein, And The Same Is Submitted Subject To Errors, Omissions, Change Of Price, Rental Or Other Conditions, Prior Sale, Lease Or Financing, Or Withdrawal Without Notice, And Of Any Special Listing Conditions Imposed By Our Principals No Warranties Or Representations Are Made As To The Condition Of The Property Or Any Hazards Contained Therein Are Any To Be Implied."
+          />
+        </section>
+
+        <hr className="my-4" />
+
+        {/* Listing Visibility */}
+        <section>
+          <h5 className="fw-bold mb-3">Listing Visibility</h5>
+          <div className="form-check mb-3">
+            <input type="checkbox" className="form-check-input" id="share-on-market" />
+            <label className="form-check-label fw-medium" htmlFor="share-on-market">
+              Share &apos;On Market&apos; Listings
+            </label>
+            <div className="form-text">
+              Users can see other users on market listings in the index and public docs from within the listing view
+            </div>
+          </div>
+          <div className="form-check">
+            <input type="checkbox" className="form-check-input" id="share-closed" />
+            <label className="form-check-label fw-medium" htmlFor="share-closed">
+              Share &apos;Closed&apos; Listings
+            </label>
+            <div className="form-text">
+              Users can see other users closed listings in the index and public docs from within the listing view
+            </div>
+          </div>
+        </section>
+
+        <div className="d-flex justify-content-end mt-4">
+          <button className="btn btn-primary px-4">Save Changes</button>
+        </div>
+      </TabPanel>
+
+      <TabPanel value="styles">
+        <div className="text-muted py-4 text-center" style={{ fontSize: 13 }}>
+          No styles configured.
+        </div>
+      </TabPanel>
+    </Tabs>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 function CompanySettingsPage() {
-  const [activeSection, setActiveSection] = useState("back-office");
+  const [activeSection, setActiveSection] = useState("company");
   const [openModalFor, setOpenModalFor] = useState<string | null>(null);
   const [assignments, setAssignments] = useState<Record<string, UserAssignment[]>>({
     Referrals: [],
@@ -403,9 +614,12 @@ function CompanySettingsPage() {
           ))}
         </div>
 
-        {/* Main content — Commission Plans section */}
+        {/* Main content */}
         <div className="flex-grow-1 p-5 overflow-auto">
-
+          {activeSection === "company" ? (
+            <CompanySection />
+          ) : (
+          <>
           {/* Commission Plans */}
           <section className="mb-6">
             <h5 className="fw-bold mb-4">Commission Plans</h5>
@@ -540,6 +754,8 @@ function CompanySettingsPage() {
               </Table>
             </div>
           </section>
+          </>
+          )}
         </div>
       </div>
 

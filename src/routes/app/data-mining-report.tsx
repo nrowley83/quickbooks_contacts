@@ -1,6 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass, faChevronLeft, faSort } from "@fortawesome/pro-regular-svg-icons";
+import {
+  faMagnifyingGlass,
+  faChevronLeft,
+  faArrowUpWideShort,
+} from "@fortawesome/pro-regular-svg-icons";
 
 export const Route = createFileRoute("/app/data-mining-report")({
   component: DataMiningReportPage,
@@ -136,7 +140,7 @@ function DataMiningReportPage() {
                   }}
                 >
                   {h}
-                  <FontAwesomeIcon icon={faSort} className="text-muted ms-1" style={{ fontSize: 11 }} />
+                  <FontAwesomeIcon icon={faArrowUpWideShort} className="text-muted ms-1" style={{ fontSize: 11 }} />
                 </th>
               ))}
             </tr>
